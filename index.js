@@ -11,7 +11,7 @@ const optionsGET = {
 	url: 'https://api.jsonbin.io/b/5de15b063da40e6f299214b9/latest',
 	json: true,
 	headers: {
-		'secret-key': process.env.json
+		'secret-key': process.env.JSON
 	}
 };
 
@@ -36,7 +36,7 @@ function updateJSON(data, successFunct) {
 		url: 'https://api.jsonbin.io/b/5de15b063da40e6f299214b9',
 		json: true,
 		headers: {
-			'secret-key': process.env.json,
+			'secret-key': process.env.JSON,
 			versioning: false
 		},
 		body: data
@@ -117,4 +117,4 @@ client.on('channelDelete', (channel) => {
 	}
 });
 
-client.login(process.env.token);
+client.login(process.env.TOKEN);
