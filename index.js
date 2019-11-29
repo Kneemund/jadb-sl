@@ -1,9 +1,26 @@
 const discord = require('discord.js');
 const fs = require('fs');
 const embeds = require('./embeds');
+const request = require('request');
+
+// require('dotenv').config();
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-const shaderChannelData = JSON.parse(fs.readFileSync('./shaderChannelData.json', 'utf8'));
+
+const optionsGET = {
+	url: 'https://api.jsonbin.io/b/5de15b063da40e6f299214b9/latest',
+	json: true,
+	headers: {
+		'secret-key': process.env.json
+	}
+};
+
+var dataJSON;
+request.get(optionsGET, (error, _response, body) => {
+	if (error) console.error(error);
+	// console.log(body);
+	dataJSON = body;
+});
 
 const autoRoleID = '649690332174483459';
 const adminRoleID = '649708528310681640';
@@ -14,10 +31,21 @@ var cmdmap = {
 	shader: cmdShader
 };
 
-function updateShaderData(data, successFunct) {
-	fs.writeFile('./shaderChannelData.json', JSON.stringify(data, null, 4), (err) => {
-		if (err) console.error(err);
+function updateJSON(data, successFunct) {
+	var optionsPUT = {
+		url: 'https://api.jsonbin.io/b/5de15b063da40e6f299214b9',
+		json: true,
+		headers: {
+			'secret-key': process.env.json,
+			versioning: false
+		},
+		body: data
+	};
+
+	request.put(optionsPUT, (error, _response, body) => {
+		if (error) console.errror(error);
 		else if (successFunct) successFunct();
+		// console.log(body);
 	});
 }
 
@@ -27,23 +55,23 @@ function cmdShader(msg, arguments, author) {
 	if (arguments[0] === 'init') {
 		var channelDevs = msg.mentions.users.keyArray();
 		if (msg.mentions.users.first()) {
-			shaderChannelData[msg.channel] = { devsID: channelDevs };
-			updateShaderData(shaderChannelData, () => {
-				embeds.feedback(msg.channel, `Successfully linked <@${shaderChannelData[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
+			dataJSON.shader[msg.channel] = { devsID: channelDevs };
+			updateJSON(dataJSON, () => {
+				embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
 			});
 		} else {
 			embeds.errorSyntax(msg.channel, '!shader init @shader_developer [...]');
 		}
 	} else if (arguments[0] === 'reset') {
-		if (shaderChannelData[msg.channel]) {
-			delete shaderChannelData[msg.channel];
-			updateShaderData(shaderChannelData);
+		if (dataJSON.shader[msg.channel]) {
+			delete dataJSON.shader[msg.channel];
+			updateJSON(dataJSON);
 			embeds.feedback(msg.channel, `Successfully reset ${msg.channel}.`);
 		} else {
 			embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
 		}
 	} else if (arguments[0] === 'info') {
-		var channelData = shaderChannelData[msg.channel];
+		var channelData = dataJSON.shader[msg.channel];
 		if (channelData) embeds.feedback(msg.channel, `Channel: ${msg.channel}\nDeveloper: <@${channelData.devsID.join('>, <@')}>`);
 		else embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
 	} else {
@@ -56,7 +84,7 @@ function cmdInvalid(msg, arguments, invoke) {
 }
 
 client.on('ready', () => {
-	console.log(`Logged in as ${client.user.username}`);
+	console.log(`Deployed as ${client.user.username}`);
 });
 
 client.on('message', (msg) => {
@@ -83,14 +111,10 @@ client.on('guildMemberAdd', (member) => {
 });
 
 client.on('channelDelete', (channel) => {
-	if (shaderChannelData[channel]) {
-		delete shaderChannelData[channel];
-		updateShaderData(shaderChannelData);
+	if (dataJSON.shader[channel]) {
+		delete dataJSON.shader[channel];
+		updateJSON(dataJSON);
 	}
 });
 
-require('http').createServer().listen(3000);
 client.login(process.env.token);
-
-// const token = JSON.parse(fs.readFileSync('token.json', 'utf8'));
-// client.login(token.token);
