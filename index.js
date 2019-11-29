@@ -18,8 +18,8 @@ const optionsGET = {
 var dataJSON;
 request.get(optionsGET, (error, _response, body) => {
 	if (error) console.error(error);
-	// console.log(body);
 	dataJSON = body;
+	// console.log(body);
 });
 
 const autoRoleID = '649690332174483459';
@@ -32,7 +32,7 @@ var cmdmap = {
 };
 
 function updateJSON(data, successFunct) {
-	var optionsPUT = {
+	const optionsPUT = {
 		url: 'https://api.jsonbin.io/b/5de15b063da40e6f299214b9',
 		json: true,
 		headers: {
@@ -52,30 +52,37 @@ function updateJSON(data, successFunct) {
 function cmdShader(msg, arguments, author) {
 	// if (!author.guild.roles.find((r) => r.id == adminRoleID)) return;
 
-	if (arguments[0] === 'init') {
-		var channelDevs = msg.mentions.users.keyArray();
-		if (msg.mentions.users.first()) {
-			dataJSON.shader[msg.channel] = { devsID: channelDevs };
-			updateJSON(dataJSON, () => {
-				embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
-			});
-		} else {
-			embeds.errorSyntax(msg.channel, '!shader init @shader_developer [...]');
-		}
-	} else if (arguments[0] === 'reset') {
-		if (dataJSON.shader[msg.channel]) {
-			delete dataJSON.shader[msg.channel];
-			updateJSON(dataJSON);
-			embeds.feedback(msg.channel, `Successfully reset ${msg.channel}.`);
-		} else {
-			embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
-		}
-	} else if (arguments[0] === 'info') {
-		var channelData = dataJSON.shader[msg.channel];
-		if (channelData) embeds.feedback(msg.channel, `Channel: ${msg.channel}\nDeveloper: <@${channelData.devsID.join('>, <@')}>`);
-		else embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
-	} else {
-		embeds.errorSyntax(msg.channel, '!shader <info|init|reset>');
+	switch (arguments[0]) {
+		case 'init':
+			var channelDevs = msg.mentions.users.keyArray();
+			if (msg.mentions.users.first()) {
+				dataJSON.shader[msg.channel] = { devsID: channelDevs };
+				updateJSON(dataJSON, () => {
+					embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
+				});
+			} else {
+				embeds.errorSyntax(msg.channel, '!shader init @shader_developer [...]');
+			}
+			break;
+		case 'reset':
+			if (dataJSON.shader[msg.channel]) {
+				delete dataJSON.shader[msg.channel];
+				updateJSON(dataJSON);
+				embeds.feedback(msg.channel, `Successfully reset ${msg.channel}.`);
+			} else {
+				embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
+			}
+			break;
+		case 'info':
+			var channelData = dataJSON.shader[msg.channel];
+			if (channelData) {
+				embeds.feedback(msg.channel, `Channel: ${msg.channel}\nDeveloper: <@${channelData.devsID.join('>, <@')}>`);
+			} else {
+				embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
+			}
+			break;
+		default:
+			embeds.errorSyntax(msg.channel, '!shader <info|init|reset>');
 	}
 }
 
@@ -84,7 +91,7 @@ function cmdInvalid(msg, arguments, invoke) {
 }
 
 client.on('ready', () => {
-	console.log(`Deployed as ${client.user.username}`);
+	console.log(`Deployed as ${client.user.username}...`);
 });
 
 client.on('message', (msg) => {
