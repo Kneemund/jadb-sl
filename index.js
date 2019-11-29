@@ -40,7 +40,8 @@ function cmdShader(msg, arguments, author) {
 			embeds.errorSyntax(msg.channel, '!shader init @ShaderDeveloper');
 		}
 	} else if (arguments[0] === 'info') {
-		embeds.feedback(msg.channel, `Channel: ${msg.channel}\nDeveloper: <@${shaderChannelData[msg.channel].shaderDevID}>`);
+		var channelData = shaderChannelData[msg.channel];
+		if (channelData) embeds.feedback(msg.channel, `Channel: ${msg.channel}\nDeveloper: <@${channelData.shaderDevID}>`);
 	} else {
 		embeds.errorSyntax(msg.channel, '!shader <info|init>');
 	}
@@ -83,3 +84,6 @@ client.on('channelDelete', (channel) => {
 });
 
 client.login(process.env.TOKEN);
+
+// const token = JSON.parse(fs.readFileSync('token.json', 'utf8'));
+// client.login(token.token);
