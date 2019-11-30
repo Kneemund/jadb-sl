@@ -110,6 +110,7 @@ function cmdShader(msg, arguments, author) {
 			break;
 		case 'config':
 			if (!isDev && !isAuthorized) embeds.errorAuthorized(msg.channel, '');
+			else if (!dataJSON.shader[msg.channel]) embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
 			else {
 				embeds.feedback(msg.channel, 'You are allowed to configure this channel.');
 			}
