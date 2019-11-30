@@ -19,11 +19,7 @@ var dataJSON;
 request.get(optionsGET, (error, _response, body) => {
 	if (error) console.error(error);
 	dataJSON = body;
-	// console.log(body);
 });
-
-const autoRoleID = '649690332174483459';
-const adminRoleID = '649708528310681640';
 
 var client = new discord.Client();
 
@@ -42,20 +38,19 @@ function updateJSON(data, successFunct) {
 		body: data
 	};
 
-	request.put(optionsPUT, (error, _response, body) => {
+	request.put(optionsPUT, (error, _response, _body) => {
 		if (error) console.errror(error);
 		else if (successFunct) successFunct();
-		// console.log(body);
 	});
 }
 
 function cmdShader(msg, arguments, author) {
-	// if (!author.guild.roles.find((r) => r.id == adminRoleID)) return;
-
+	const isAuthorized = Boolean(author.roles.find((r) => r.id == config.adminRoleID));
 	switch (arguments[0]) {
 		case 'init':
-			var channelDevs = msg.mentions.users.keyArray();
-			if (msg.mentions.users.first()) {
+			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
+			else if (msg.mentions.users.first()) {
+				var channelDevs = msg.mentions.users.keyArray();
 				dataJSON.shader[msg.channel] = { devsID: channelDevs };
 				updateJSON(dataJSON, () => {
 					embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
@@ -65,7 +60,8 @@ function cmdShader(msg, arguments, author) {
 			}
 			break;
 		case 'reset':
-			if (dataJSON.shader[msg.channel]) {
+			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
+			else if (dataJSON.shader[msg.channel]) {
 				delete dataJSON.shader[msg.channel];
 				updateJSON(dataJSON);
 				embeds.feedback(msg.channel, `Successfully reset ${msg.channel}.`);
@@ -87,7 +83,7 @@ function cmdShader(msg, arguments, author) {
 }
 
 function cmdInvalid(msg, arguments, invoke) {
-	embeds.error(msg.channel, `The command "${invoke}" doesn't exist.`, 'Invalid Command!');
+	embeds.error(msg.channel, `The command "${invoke}" doesn't exist.`, 'Invalid Command');
 }
 
 client.on('ready', () => {
@@ -113,7 +109,7 @@ client.on('message', (msg) => {
 });
 
 client.on('guildMemberAdd', (member) => {
-	var role = member.guild.roles.find((r) => r.id == autoRoleID);
+	var role = member.guild.roles.find((r) => r.id == config.autoRoleID);
 	if (role) member.addRole(role);
 });
 

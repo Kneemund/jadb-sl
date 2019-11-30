@@ -7,12 +7,6 @@ const colors = {
 };
 
 module.exports = {
-	/**
-     * Send an error embed.
-     * @param {Discord.Channel} channel 
-     * @param {string} content 
-     * @param {string} title 
-     */
 	error(channel, content, title) {
 		var config = {
 			embed: {
@@ -33,6 +27,20 @@ module.exports = {
 				color: colors.red,
 				description: syntax,
 				title: 'Syntax Error'
+			}
+		};
+
+		channel.send('', config).then((msg) => {
+			return msg;
+		});
+	},
+
+	errorAuthorized(channel, command) {
+		var config = {
+			embed: {
+				color: colors.red,
+				description: command,
+				title: 'Insufficient Permissions'
 			}
 		};
 
