@@ -109,7 +109,7 @@ function cmdShader(msg, arguments, author) {
 			}
 			break;
 		case 'config':
-			if (!isDev || !isAuthorized) embeds.errorAuthorized(msg.channel, '');
+			if (!isDev && !isAuthorized) embeds.errorAuthorized(msg.channel, '');
 			else {
 				embeds.feedback(msg.channel, 'You are allowed to configure this channel.');
 			}
