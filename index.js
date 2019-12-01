@@ -27,8 +27,7 @@ var cmdmap = {
 	help: cmdHelp,
 	wiki: cmdWiki,
 	optifine: cmdOptifine,
-	shader: cmdShader,
-	sort: sortChannels
+	shader: cmdShader
 };
 
 function updateJSON(data, successFunct) {
@@ -133,10 +132,8 @@ function cmdInvalid(msg, _arguments, invoke) {
 	embeds.error(msg.channel, `The command "${invoke}" doesn't exist.`, 'Invalid Command');
 }
 
-function sortChannels(msg) {
-	const category = client.channels.find((r) => r.id == config.shaderCategoryID);
+function sortChannels(category /*, msg*/) {
 	var sorted = category.children.keyArray();
-
 	sorted.sort((a, b) => {
 		var nameA = category.children.find((r) => r.id == a).name;
 		var nameB = category.children.find((r) => r.id == b).name;
@@ -146,15 +143,11 @@ function sortChannels(msg) {
 		return 0;
 	});
 
-	// sorted.forEach((e) => {
-	// 	console.log(category.children.find((r) => r.id == e).name);
-	// });
+	sorted.forEach((element, i) => {
+		category.children.find((r) => r.id == element).edit({ position: i + 1 });
+	});
 
-	for (var i = 0; i < sorted.length; ++i) {
-		category.children.find((r) => r.id == sorted[i]).edit({ position: i + 1 });
-	}
-
-	if (msg) embeds.feedback(msg.channel, 'All channels sorted.');
+	// if (msg) embeds.feedback(msg.channel, 'All channels sorted.');
 }
 
 client.on('ready', () => {
@@ -179,11 +172,13 @@ client.on('message', (msg) => {
 	}
 });
 
-client.on('guildMemberAdd', (member) => {
-	var role = member.guild.roles.find((r) => r.id == config.autoRoleID);
-	if (role) member.addRole(role);
-});
+// auto roles
+// client.on('guildMemberAdd', (member) => {
+// 	var role = member.guild.roles.find((r) => r.id == config.autoRoleID);
+// 	if (role) member.addRole(role);
+// });
 
+// remove channel from json object
 client.on('channelDelete', (channel) => {
 	if (dataJSON.shader[channel]) {
 		delete dataJSON.shader[channel];
@@ -191,7 +186,26 @@ client.on('channelDelete', (channel) => {
 	}
 });
 
-// client.on('channelUpdate', sortChannels());
-// client.on('channelCreate', sortChannels());
+// automatic channel sorting
+client.on('channelUpdate', (oldChannel, newChannel) => {
+	const category = client.channels.find((r) => r.id == newChannel.parentID && r.type == 'category');
+	if (category) {
+		if (oldChannel.name !== newChannel.name && config.sortCategoryIDs.includes(category.id)) {
+			// console.log(oldChannel.name + ' was renamed to ' + newChannel.name + '. All channels sorted.');
+			sortChannels(category);
+		}
+	}
+});
+
+// automatic channel sorting
+client.on('channelCreate', (channel) => {
+	const category = client.channels.find((r) => r.id == channel.parentID && r.type == 'category');
+	if (category) {
+		if (config.sortCategoryIDs.includes(category.id)) {
+			// console.log(channel.name + ' created. All channels sorted.');
+			sortChannels(category);
+		}
+	}
+});
 
 client.login(process.env.TOKEN);
