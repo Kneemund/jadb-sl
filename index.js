@@ -27,7 +27,8 @@ var cmdmap = {
 	help: cmdHelp,
 	wiki: cmdWiki,
 	optifine: cmdOptifine,
-	shader: cmdShader
+	shader: cmdShader,
+	sort: sortChannels
 };
 
 function updateJSON(data, successFunct) {
@@ -128,8 +129,32 @@ function cmdShader(msg, arguments, author) {
 	}
 }
 
-function cmdInvalid(msg, arguments, invoke) {
+function cmdInvalid(msg, _arguments, invoke) {
 	embeds.error(msg.channel, `The command "${invoke}" doesn't exist.`, 'Invalid Command');
+}
+
+function sortChannels(msg) {
+	const category = client.channels.find((r) => r.id == config.shaderCategoryID);
+	var sorted = category.children.keyArray();
+
+	sorted.sort((a, b) => {
+		var nameA = category.children.find((r) => r.id == a).name;
+		var nameB = category.children.find((r) => r.id == b).name;
+
+		if (nameA < nameB) return -1;
+		if (nameA > nameB) return 1;
+		return 0;
+	});
+
+	// sorted.forEach((e) => {
+	// 	console.log(category.children.find((r) => r.id == e).name);
+	// });
+
+	for (var i = 0; i < sorted.length; ++i) {
+		category.children.find((r) => r.id == sorted[i]).edit({ position: i + 1 });
+	}
+
+	if (msg) embeds.feedback(msg.channel, 'All channels sorted.');
 }
 
 client.on('ready', () => {
@@ -165,5 +190,8 @@ client.on('channelDelete', (channel) => {
 		updateJSON(dataJSON);
 	}
 });
+
+// client.on('channelUpdate', sortChannels());
+// client.on('channelCreate', sortChannels());
 
 client.login(process.env.TOKEN);
