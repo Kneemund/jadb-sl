@@ -94,6 +94,16 @@ function cmdShader(msg, arguments, author) {
 				updateJSON(dataJSON, () => {
 					embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
 				});
+
+				msg.channel.replacePermissionOverwrites({
+					overwrites: [
+						{
+							id: channelDevs[0],
+							allow: [ 'MANAGE_CHANNELS' ]
+						}
+					],
+					reason: 'Shader Dev initialized.'
+				});
 			} else {
 				embeds.errorSyntax(msg.channel, '!shader init @shader_developer [...]');
 			}
@@ -132,7 +142,7 @@ function cmdInvalid(msg, _arguments, invoke) {
 	embeds.error(msg.channel, `The command "${invoke}" doesn't exist.`, 'Invalid Command');
 }
 
-function sortChannels(category /*, msg*/) {
+function sortChannels(category) {
 	var sorted = category.children.keyArray();
 	sorted.sort((a, b) => {
 		var nameA = category.children.find((r) => r.id == a).name;
@@ -147,7 +157,7 @@ function sortChannels(category /*, msg*/) {
 		category.children.find((r) => r.id == element).edit({ position: i + 1 });
 	});
 
-	// if (msg) embeds.feedback(msg.channel, 'All channels sorted.');
+	// https://discord.js.org/#/docs/main/stable/class/Guild?scrollTo=setChannelPositions
 }
 
 client.on('ready', () => {
