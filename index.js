@@ -3,7 +3,7 @@ const fs = require('fs');
 const embeds = require('./embeds');
 const request = require('request');
 
-// require('dotenv').config();
+require('dotenv').config();
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
@@ -90,19 +90,21 @@ function cmdShader(msg, arguments, author) {
 			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
 			else if (msg.mentions.users.first()) {
 				var channelDevs = msg.mentions.users.keyArray();
+				// delete all previous permissions
+				msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).forEach((element) => {
+					element.delete();
+				});
+
 				dataJSON.shader[msg.channel] = { devsID: channelDevs };
 				updateJSON(dataJSON, () => {
 					embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
 				});
 
-				msg.channel.replacePermissionOverwrites({
-					overwrites: [
-						{
-							id: channelDevs[0],
-							allow: [ 'MANAGE_CHANNELS' ]
-						}
-					],
-					reason: 'Shader Dev initialized.'
+				// set permissions
+				channelDevs.forEach((element) => {
+					msg.channel.overwritePermissions(element, {
+						MANAGE_CHANNELS: true
+					});
 				});
 			} else {
 				embeds.errorSyntax(msg.channel, '!shader init @shader_developer [...]');
@@ -111,9 +113,15 @@ function cmdShader(msg, arguments, author) {
 		case 'reset':
 			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
 			else if (dataJSON.shader[msg.channel]) {
+				// delete all permissions
+				msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).forEach((element) => {
+					element.delete();
+				});
+
 				delete dataJSON.shader[msg.channel];
-				updateJSON(dataJSON);
-				embeds.feedback(msg.channel, `Successfully reset ${msg.channel}.`);
+				updateJSON(dataJSON, () => {
+					embeds.feedback(msg.channel, `Successfully reset ${msg.channel}.`);
+				});
 			} else {
 				embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
 			}
@@ -162,6 +170,7 @@ function sortChannels(category) {
 
 client.on('ready', () => {
 	console.log(`Deployed as ${client.user.username}...`);
+	client.user.setActivity(`${config.prefix}<command>`, { type: 'LISTENING' });
 });
 
 client.on('message', (msg) => {
@@ -201,7 +210,6 @@ client.on('channelUpdate', (oldChannel, newChannel) => {
 	const category = client.channels.find((r) => r.id == newChannel.parentID && r.type == 'category');
 	if (category) {
 		if (oldChannel.name !== newChannel.name && config.sortCategoryIDs.includes(category.id)) {
-			// console.log(oldChannel.name + ' was renamed to ' + newChannel.name + '. All channels sorted.');
 			sortChannels(category);
 		}
 	}
@@ -212,7 +220,6 @@ client.on('channelCreate', (channel) => {
 	const category = client.channels.find((r) => r.id == channel.parentID && r.type == 'category');
 	if (category) {
 		if (config.sortCategoryIDs.includes(category.id)) {
-			// console.log(channel.name + ' created. All channels sorted.');
 			sortChannels(category);
 		}
 	}
