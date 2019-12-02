@@ -3,7 +3,7 @@ const fs = require('fs');
 const embeds = require('./embeds');
 const request = require('request');
 
-require('dotenv').config();
+// require('dotenv').config();
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
@@ -176,8 +176,8 @@ client.on('ready', () => {
 client.on('message', (msg) => {
 	var content = msg.content;
 	var author = msg.member;
-	// var channel = msg.channel;
-	// var guild = msg.guild;
+
+	if (!author) return;
 
 	if (author.id !== client.user.id && content.startsWith(config.prefix)) {
 		var invoke = content.split(' ')[0].substr(config.prefix.length);
