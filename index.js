@@ -27,7 +27,8 @@ var cmdmap = {
 	help: cmdHelp,
 	wiki: cmdWiki,
 	optifine: cmdOptifine,
-	shader: cmdShader
+	shader: cmdShader,
+	download: cmdDownload
 };
 
 function updateJSON(data, successFunct) {
@@ -75,11 +76,15 @@ function cmdOptifine(msg, arguments) {
 }
 
 function getAuthorized(author) {
-	return Boolean(author.roles.find((r) => r.id == config.adminRoleID));
+	return Boolean(author.roles.find((element) => element.id == config.adminRoleID));
 }
 
 function getDev(msg, author) {
-	return dataJSON.shader[msg.channel] ? Boolean(dataJSON.shader[msg.channel].devsID.find((id) => id == author.id)) : false;
+	try {
+		return dataJSON.shader[msg.channel].devsID.includes(author.id);
+	} catch (error) {
+		return false;
+	}
 }
 
 function cmdShader(msg, arguments, author) {
@@ -89,13 +94,15 @@ function cmdShader(msg, arguments, author) {
 		case 'init':
 			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
 			else if (msg.mentions.users.first()) {
+				if (!dataJSON.shader[msg.channel]) dataJSON.shader[msg.channel] = {};
 				var channelDevs = msg.mentions.users.keyArray();
-				// delete all previous permissions
-				msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).forEach((element) => {
-					element.delete();
-				});
 
-				dataJSON.shader[msg.channel] = { devsID: channelDevs };
+				// delete all previous permissions
+				if (dataJSON.shader[msg.channel].devsID) {
+					msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).deleteAll();
+				}
+
+				dataJSON.shader[msg.channel].devsID = channelDevs;
 				updateJSON(dataJSON, () => {
 					embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
 				});
@@ -114,9 +121,9 @@ function cmdShader(msg, arguments, author) {
 			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
 			else if (dataJSON.shader[msg.channel]) {
 				// delete all permissions
-				msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).forEach((element) => {
-					element.delete();
-				});
+				if (dataJSON.shader[msg.channel].devsID) {
+					msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).deleteAll();
+				}
 
 				delete dataJSON.shader[msg.channel];
 				updateJSON(dataJSON, () => {
@@ -130,7 +137,28 @@ function cmdShader(msg, arguments, author) {
 			if (!isDev && !isAuthorized) embeds.errorAuthorized(msg.channel, '');
 			else if (!dataJSON.shader[msg.channel]) embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
 			else {
-				embeds.feedback(msg.channel, 'You are allowed to configure this channel.');
+				var value = arguments.slice(2);
+				if (!dataJSON.shader[msg.channel].download) dataJSON.shader[msg.channel].download = {};
+				switch (arguments[1]) {
+					case 'text':
+						dataJSON.shader[msg.channel].download.text = value.join(' ');
+						break;
+					case 'link':
+						dataJSON.shader[msg.channel].download.link = value[0];
+						break;
+					case 'thumbnail':
+						dataJSON.shader[msg.channel].download.thumbnail = [ value[0], value[1] ];
+						break;
+					default:
+						embeds.errorSyntax(msg.channel, '!shader config <text|link|thumbnail>');
+						return;
+				}
+
+				updateJSON(dataJSON, () => {
+					embeds.feedback(msg.channel, `Successfully updated "${arguments[1]}" in ${msg.channel}.`);
+				});
+
+				// embeds.feedback(msg.channel, 'You are allowed to configure this channel.');
 			}
 			break;
 		case 'info':
@@ -143,6 +171,25 @@ function cmdShader(msg, arguments, author) {
 			break;
 		default:
 			embeds.errorSyntax(msg.channel, '!shader <info|config|init|reset>');
+	}
+}
+
+function cmdDownload(msg, _arguments, _author) {
+	try {
+		if (!dataJSON.shader[msg.channel]) {
+			embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
+			return;
+		}
+
+		var values = dataJSON.shader[msg.channel].download;
+		if ((values.text == '' || !values.text) && (values.link == '' || !values.link)) throw Error;
+		if (!values.text) values.text = '';
+		if (!values.link) values.link = '';
+		if (!values.thumbnail) values.thumbnail = [ '', '' ];
+
+		embeds.answer(msg.channel, `${values.text}\n${values.link}`, 'Download', values.thumbnail[0], values.thumbnail[1] === 'true' ? true : false);
+	} catch (error) {
+		embeds.error(msg.channel, 'No !download command was configured by the shader developer(s).');
 	}
 }
 
