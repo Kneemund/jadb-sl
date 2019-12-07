@@ -104,7 +104,7 @@ function cmdShader(msg, arguments, author) {
 
 				dataJSON.shader[msg.channel].devsID = channelDevs;
 				updateJSON(dataJSON, () => {
-					embeds.feedback(msg.channel, `Successfully linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
+					embeds.feedback(msg.channel, `Linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
 				});
 
 				// set permissions
@@ -127,7 +127,7 @@ function cmdShader(msg, arguments, author) {
 
 				delete dataJSON.shader[msg.channel];
 				updateJSON(dataJSON, () => {
-					embeds.feedback(msg.channel, `Successfully reset ${msg.channel}.`);
+					embeds.feedback(msg.channel, `${msg.channel} was reset.`);
 				});
 			} else {
 				embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
@@ -155,10 +155,8 @@ function cmdShader(msg, arguments, author) {
 				}
 
 				updateJSON(dataJSON, () => {
-					embeds.feedback(msg.channel, `Successfully updated "${arguments[1]}" in ${msg.channel}.`);
+					embeds.feedback(msg.channel, `The ${arguments[1]} of ${msg.channel} was updated.`);
 				});
-
-				// embeds.feedback(msg.channel, 'You are allowed to configure this channel.');
 			}
 			break;
 		case 'info':
