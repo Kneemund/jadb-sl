@@ -89,19 +89,19 @@ module.exports = {
 				description: 'Commands:',
 				fields: [
 					{
-						name: '!help',
+						name: '`!help`',
 						value: 'Displays this help section.'
 					},
 					{
-						name: '!wiki',
+						name: '`!wiki`',
 						value: 'Link to the official shader wiki.'
 					},
 					{
-						name: '!optifine <download|server>',
+						name: '`!optifine <download|server>`',
 						value: 'Links to optifine-related stuff.'
 					},
 					{
-						name: '!shader <info|config|init|reset>',
+						name: '`!channel <info|config|init|reset>`',
 						value: 'Commands to manage and get information about shader channels.'
 					}
 				],
