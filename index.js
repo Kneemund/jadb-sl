@@ -27,7 +27,7 @@ var cmdmap = {
 	help: cmdHelp,
 	wiki: cmdWiki,
 	optifine: cmdOptifine,
-	shader: cmdShader,
+	channel: cmdChannel,
 	download: cmdDownload
 };
 
@@ -71,7 +71,7 @@ function cmdOptifine(msg, arguments) {
 			);
 			break;
 		default:
-			embeds.errorSyntax(msg.channel, '!optifine <download|server>');
+			embeds.errorSyntax(msg.channel, '`!optifine <download|server>`');
 	}
 }
 
@@ -81,30 +81,30 @@ function getAuthorized(author) {
 
 function getDev(msg, author) {
 	try {
-		return dataJSON.shader[msg.channel].devsID.includes(author.id);
+		return dataJSON.channel[msg.channel].devsID.includes(author.id);
 	} catch (error) {
 		return false;
 	}
 }
 
-function cmdShader(msg, arguments, author) {
+function cmdChannel(msg, arguments, author) {
 	const isAuthorized = getAuthorized(author);
 	const isDev = getDev(msg, author);
 	switch (arguments[0]) {
 		case 'init':
 			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
 			else if (msg.mentions.users.first()) {
-				if (!dataJSON.shader[msg.channel]) dataJSON.shader[msg.channel] = {};
+				if (!dataJSON.channel[msg.channel]) dataJSON.channel[msg.channel] = {};
 				var channelDevs = msg.mentions.users.keyArray();
 
 				// delete all previous permissions
-				if (dataJSON.shader[msg.channel].devsID) {
-					msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).deleteAll();
+				if (dataJSON.channel[msg.channel].devsID) {
+					msg.channel.permissionOverwrites.filter((element) => dataJSON.channel[msg.channel].devsID.includes(element.id)).deleteAll();
 				}
 
-				dataJSON.shader[msg.channel].devsID = channelDevs;
+				dataJSON.channel[msg.channel].devsID = channelDevs;
 				updateJSON(dataJSON, () => {
-					embeds.feedback(msg.channel, `Linked <@${dataJSON.shader[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
+					embeds.feedback(msg.channel, `Linked <@${dataJSON.channel[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
 				});
 
 				// set permissions
@@ -114,43 +114,49 @@ function cmdShader(msg, arguments, author) {
 					});
 				});
 			} else {
-				embeds.errorSyntax(msg.channel, '!shader init @shader_developer [...]');
+				embeds.errorSyntax(msg.channel, '`!channel init @developer [...]`');
 			}
 			break;
 		case 'reset':
 			if (!isAuthorized) embeds.errorAuthorized(msg.channel, '');
-			else if (dataJSON.shader[msg.channel]) {
+			else if (dataJSON.channel[msg.channel]) {
 				// delete all permissions
-				if (dataJSON.shader[msg.channel].devsID) {
-					msg.channel.permissionOverwrites.filter((element) => dataJSON.shader[msg.channel].devsID.includes(element.id)).deleteAll();
+				if (dataJSON.channel[msg.channel].devsID) {
+					msg.channel.permissionOverwrites.filter((element) => dataJSON.channel[msg.channel].devsID.includes(element.id)).deleteAll();
 				}
 
-				delete dataJSON.shader[msg.channel];
+				delete dataJSON.channel[msg.channel];
 				updateJSON(dataJSON, () => {
 					embeds.feedback(msg.channel, `${msg.channel} was reset.`);
 				});
 			} else {
-				embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
+				embeds.error(msg.channel, `${msg.channel} is not initialized.`);
 			}
 			break;
 		case 'config':
 			if (!isDev && !isAuthorized) embeds.errorAuthorized(msg.channel, '');
-			else if (!dataJSON.shader[msg.channel]) embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
+			else if (!dataJSON.channel[msg.channel]) embeds.error(msg.channel, `${msg.channel} is not initialized.`);
 			else {
 				var value = arguments.slice(2);
-				if (!dataJSON.shader[msg.channel].download) dataJSON.shader[msg.channel].download = {};
+				if (!dataJSON.channel[msg.channel].download) dataJSON.channel[msg.channel].download = {};
 				switch (arguments[1]) {
 					case 'text':
-						dataJSON.shader[msg.channel].download.text = value.join(' ');
+						dataJSON.channel[msg.channel].download.text = value.join(' ');
 						break;
 					case 'link':
-						dataJSON.shader[msg.channel].download.link = value[0];
+						dataJSON.channel[msg.channel].download.link = value[0];
 						break;
 					case 'thumbnail':
-						dataJSON.shader[msg.channel].download.thumbnail = [ value[0], value[1] ];
+						dataJSON.channel[msg.channel].download.thumbnail = [ value[0], value[1] ];
 						break;
+					case 'reset':
+						dataJSON.channel[msg.channel].download = {};
+						updateJSON(dataJSON, () => {
+							embeds.feedback(msg.channel, `\`!download\` of ${msg.channel} was reset.`);
+						});
+						return;
 					default:
-						embeds.errorSyntax(msg.channel, '!shader config <text|link|thumbnail>');
+						embeds.errorSyntax(msg.channel, '`!channel config <text|link|thumbnail>`');
 						return;
 				}
 
@@ -160,26 +166,26 @@ function cmdShader(msg, arguments, author) {
 			}
 			break;
 		case 'info':
-			var channelData = dataJSON.shader[msg.channel];
+			var channelData = dataJSON.channel[msg.channel];
 			if (channelData) {
 				embeds.feedback(msg.channel, `Channel: ${msg.channel}\nDeveloper: <@${channelData.devsID.join('>, <@')}>`);
 			} else {
-				embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
+				embeds.error(msg.channel, `${msg.channel} is not initialized.`);
 			}
 			break;
 		default:
-			embeds.errorSyntax(msg.channel, '!shader <info|config|init|reset>');
+			embeds.errorSyntax(msg.channel, '`!channel <info|config|init|reset>`');
 	}
 }
 
-function cmdDownload(msg, _arguments, _author) {
+function cmdDownload(msg) {
 	try {
-		if (!dataJSON.shader[msg.channel]) {
-			embeds.error(msg.channel, `${msg.channel} is not initialized as a shader channel.`);
+		if (!dataJSON.channel[msg.channel]) {
+			embeds.error(msg.channel, `${msg.channel} is not initialized.`);
 			return;
 		}
 
-		var values = dataJSON.shader[msg.channel].download;
+		var values = dataJSON.channel[msg.channel].download;
 		if ((values.text == '' || !values.text) && (values.link == '' || !values.link)) throw Error;
 		if (!values.text) values.text = '';
 		if (!values.link) values.link = '';
@@ -187,12 +193,12 @@ function cmdDownload(msg, _arguments, _author) {
 
 		embeds.answer(msg.channel, `${values.text}\n${values.link}`, 'Download', values.thumbnail[0], values.thumbnail[1] === 'true' ? true : false);
 	} catch (error) {
-		embeds.error(msg.channel, 'No !download command was configured by the shader developer(s).');
+		embeds.error(msg.channel, '`!download` was not configured by the developer(s).');
 	}
 }
 
 function cmdInvalid(msg, _arguments, invoke) {
-	embeds.error(msg.channel, `The command "${invoke}" doesn't exist.`, 'Invalid Command');
+	embeds.error(msg.channel, `The command \`!${invoke}\` doesn't exist.`, 'Invalid Command');
 }
 
 function sortChannels(category) {
@@ -244,8 +250,8 @@ client.on('message', (msg) => {
 
 // remove channel from json object
 client.on('channelDelete', (channel) => {
-	if (dataJSON.shader[channel]) {
-		delete dataJSON.shader[channel];
+	if (dataJSON.channel[channel]) {
+		delete dataJSON.channel[channel];
 		updateJSON(dataJSON);
 	}
 });
