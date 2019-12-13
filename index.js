@@ -247,6 +247,12 @@ function sortChannels(category) {
 	// https://discord.js.org/#/docs/main/stable/class/Guild?scrollTo=setChannelPositions
 }
 
+function msgNoU(content, channel, author) {
+	if (author.id !== client.user.id && content.toLowerCase().includes('no u')) {
+		channel.send('no u');
+	}
+}
+
 client.on('ready', () => {
 	console.log(`Deployed as ${client.user.username}...`);
 	client.user.setActivity(`${config.prefix}<command>`, { type: 'LISTENING' });
@@ -257,6 +263,8 @@ client.on('message', (msg) => {
 	var author = msg.member;
 
 	if (!author) return;
+
+	msgNoU(content, msg.channel, author);
 
 	if (author.id !== client.user.id && content.startsWith(config.prefix)) {
 		var invoke = content.split(' ')[0].substr(config.prefix.length);
