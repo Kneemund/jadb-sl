@@ -27,7 +27,7 @@ module.exports = {
 			embed: {
 				color: COLORS.red,
 				description: syntax,
-				title: 'Syntax Error'
+				title: 'SYNTAX ERROR'
 			}
 		};
 
@@ -41,7 +41,7 @@ module.exports = {
 			embed: {
 				color: COLORS.red,
 				description: command,
-				title: 'Insufficient Permissions'
+				title: 'INSUFFICIENT PERMISSIONS'
 			}
 		};
 
@@ -50,7 +50,7 @@ module.exports = {
 		});
 	},
 
-	feedback(channel, content, title) {
+	feedback(channel, content, title, timeout) {
 		var config = {
 			embed: {
 				color: COLORS.green,
@@ -60,7 +60,7 @@ module.exports = {
 		};
 
 		channel.send('', config).then((msg) => {
-			return msg;
+			if (timeout) msg.delete(timeout);
 		});
 	},
 
@@ -101,7 +101,9 @@ module.exports = {
 							'`!optifine `­`<­`­`download`|`server`­`>`\n' +
 							'Links to optifine-related stuff.\n\n' +
 							'`!channel `­`<­`­`info`|__`config`__|__`init`__|__`reset`__`>`\n' +
-							'Commands to manage and get information about channels.'
+							'Commands to manage and get information about channels.\n\n' +
+							'__`!purge`__` <`­`amount`­`>`\n' +
+							'Delete up to 100 messages at a time that are less than 2 weeks old.'
 					}
 				],
 				thumbnail: {

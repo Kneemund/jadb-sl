@@ -23,13 +23,16 @@ request.get(optionsGET, (error, _response, body) => {
 
 var client = new discord.Client();
 
-var cmdmap = {
+var cmdObject = {
 	help: cmdHelp,
 	wiki: cmdWiki,
 	optifine: cmdOptifine,
 	channel: cmdChannel,
-	download: cmdDownload
+	download: cmdDownload,
+	purge: cmdPurge
 };
+
+////////////////////////////////////////////////////////////////////////////////////////////
 
 function updateJSON(data, successFunct) {
 	const optionsPUT = {
@@ -48,6 +51,20 @@ function updateJSON(data, successFunct) {
 	});
 }
 
+function getAuthorized(author) {
+	return Boolean(author.roles.find((element) => element.id == config.adminRoleID));
+}
+
+function getDev(msg, author) {
+	try {
+		return dataJSON.channel[msg.channel].devsID.includes(author.id);
+	} catch (error) {
+		return false;
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
 function cmdHelp(msg) {
 	embeds.help(msg.channel, msg.guild.iconURL);
 }
@@ -56,7 +73,7 @@ function cmdWiki(msg) {
 	embeds.answer(
 		msg.channel,
 		'https://shaders.fandom.com/wiki/Shader_Packs',
-		'Official Shader Wiki',
+		'OFFICIAL SHADER WIKI',
 		'https://shaders.fandom.com/wiki/Shader_Packs',
 		true
 	);
@@ -68,7 +85,7 @@ function cmdOptifine(msg, arguments) {
 			embeds.answer(
 				msg.channel,
 				'https://optifine.net/downloads',
-				'Optifine Download',
+				'OPTIFINE DOWNLOAD',
 				'https://optifine.net/downloads',
 				true
 			);
@@ -77,25 +94,13 @@ function cmdOptifine(msg, arguments) {
 			embeds.answer(
 				msg.channel,
 				'https://discord.gg/3mMpcwW',
-				'Optifine Server',
+				'OPTIFINE SERVER',
 				'https://cdn.discordapp.com/icons/423430686880301056/a_4d188ade721bd63fc413bd7f8651a2e2.webp?size=32',
 				false
 			);
 			break;
 		default:
 			embeds.errorSyntax(msg.channel, '`!optifine <download|server>`');
-	}
-}
-
-function getAuthorized(author) {
-	return Boolean(author.roles.find((element) => element.id == config.adminRoleID));
-}
-
-function getDev(msg, author) {
-	try {
-		return dataJSON.channel[msg.channel].devsID.includes(author.id);
-	} catch (error) {
-		return false;
 	}
 }
 
@@ -216,7 +221,7 @@ function cmdDownload(msg) {
 		embeds.answer(
 			msg.channel,
 			`${values.text}\n${values.link}`,
-			'Download',
+			'DOWNLOAD',
 			values.thumbnail[0],
 			values.thumbnail[1] === 'true' ? true : false
 		);
@@ -225,9 +230,32 @@ function cmdDownload(msg) {
 	}
 }
 
-function cmdInvalid(msg, _arguments, invoke) {
-	embeds.error(msg.channel, `The command \`!${invoke}\` doesn't exist.`, 'Invalid Command');
+function cmdPurge(msg, arguments, author) {
+	if (!getAuthorized(author) && !getDev(msg, author)) return embeds.errorAuthorized(msg.channel, '');
+
+	if (isNaN(arguments[0]) || arguments[0] < 1 || arguments[0] != Math.floor(arguments[0])) {
+		return embeds.errorSyntax(msg.channel, '`!purge <amount>`');
+	}
+
+	if (arguments[0] > 100) {
+		return embeds.error(msg.channel, 'You can delete a maximum of 100 messages at once.', 'ERROR');
+	}
+
+	msg.channel
+		.bulkDelete(arguments[0])
+		.then((messages) => {
+			embeds.feedback(msg.channel, `Deleted ${messages.size}/${arguments[0]} messages.`, '', 5000);
+		})
+		.catch((err) => {
+			if (err) console.error(err);
+		});
 }
+
+function cmdInvalid(msg, _arguments, invoke) {
+	embeds.error(msg.channel, `The command \`!${invoke}\` doesn't exist.`, 'INVALID COMMAND');
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
 
 function sortChannels(category) {
 	var sorted = category.children.keyArray();
@@ -253,6 +281,8 @@ function msgNoU(content, channel, author) {
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
 client.on('ready', () => {
 	console.log(`Deployed as ${client.user.username}...`);
 	client.user.setActivity(`${config.prefix}<command>`, { type: 'LISTENING' });
@@ -270,8 +300,8 @@ client.on('message', (msg) => {
 		var invoke = content.split(' ')[0].substr(config.prefix.length);
 		var arguments = content.split(' ').slice(1);
 
-		if (invoke in cmdmap) {
-			cmdmap[invoke](msg, arguments, author);
+		if (invoke in cmdObject) {
+			cmdObject[invoke](msg, arguments, author);
 		} else {
 			cmdInvalid(msg, arguments, invoke);
 		}
