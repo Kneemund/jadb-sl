@@ -1,6 +1,6 @@
 // const { RichEmbed } = require('discord.js');
 
-const colors = {
+const COLORS = {
 	red: 0xe74c3c,
 	green: 0x2ecc71,
 	yellow: 0xf1c40f,
@@ -11,7 +11,7 @@ module.exports = {
 	error(channel, content, title) {
 		var config = {
 			embed: {
-				color: colors.red,
+				color: COLORS.red,
 				description: content,
 				title: title
 			}
@@ -25,7 +25,7 @@ module.exports = {
 	errorSyntax(channel, syntax) {
 		var config = {
 			embed: {
-				color: colors.red,
+				color: COLORS.red,
 				description: syntax,
 				title: 'Syntax Error'
 			}
@@ -39,7 +39,7 @@ module.exports = {
 	errorAuthorized(channel, command) {
 		var config = {
 			embed: {
-				color: colors.red,
+				color: COLORS.red,
 				description: command,
 				title: 'Insufficient Permissions'
 			}
@@ -53,7 +53,7 @@ module.exports = {
 	feedback(channel, content, title) {
 		var config = {
 			embed: {
-				color: colors.green,
+				color: COLORS.green,
 				description: content,
 				title: title
 			}
@@ -67,11 +67,13 @@ module.exports = {
 	answer(channel, content, title, thumbnailURL, thumbnailFromDomain) {
 		var config = {
 			embed: {
-				color: colors.blue,
+				color: COLORS.blue,
 				description: content,
 				title: title,
 				thumbnail: {
-					url: thumbnailFromDomain ? `https://plus.google.com/_/favicon?domain_url=${thumbnailURL}` : thumbnailURL
+					url: thumbnailFromDomain
+						? `https://plus.google.com/_/favicon?domain_url=${thumbnailURL}`
+						: thumbnailURL
 				}
 			}
 		};
@@ -84,29 +86,29 @@ module.exports = {
 	help(channel, thumbnailURL) {
 		const config = {
 			embed: {
-				color: colors.blue,
-				title: 'Help',
-				description: 'Commands:',
+				color: COLORS.blue,
+				title: 'HELP',
+				description: '',
 				fields: [
 					{
-						name: '`!help`',
-						value: 'Displays this help section.'
-					},
-					{
-						name: '`!wiki`',
-						value: 'Link to the official shader wiki.'
-					},
-					{
-						name: '`!optifine <download|server>`',
-						value: 'Links to optifine-related stuff.'
-					},
-					{
-						name: '`!channel <info|config|init|reset>`',
-						value: 'Commands to manage and get information about shader channels.'
+						name: 'COMMANDS',
+						// "ALT + 0173" FOR CREATING AN EMPTY SPACE TO SEPERATE `MSG``MSG`
+						value:
+							'`!help`\n' +
+							'Displays this help section.\n\n' +
+							'`!wiki`\n' +
+							'Link to the official shader wiki.\n\n' +
+							'`!optifine `­`<­`­`download`|`server`­`>`\n' +
+							'Links to optifine-related stuff.\n\n' +
+							'`!channel `­`<­`­`info`|__`config`__|__`init`__|__`reset`__`>`\n' +
+							'Commands to manage and get information about channels.'
 					}
 				],
 				thumbnail: {
 					url: thumbnailURL
+				},
+				footer: {
+					text: 'Underlined Commands are only for Admins/Developers'
 				}
 			}
 		};

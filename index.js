@@ -53,13 +53,25 @@ function cmdHelp(msg) {
 }
 
 function cmdWiki(msg) {
-	embeds.answer(msg.channel, 'https://shaders.fandom.com/wiki/Shader_Packs', 'Official Shader Wiki', 'https://shaders.fandom.com/wiki/Shader_Packs', true);
+	embeds.answer(
+		msg.channel,
+		'https://shaders.fandom.com/wiki/Shader_Packs',
+		'Official Shader Wiki',
+		'https://shaders.fandom.com/wiki/Shader_Packs',
+		true
+	);
 }
 
 function cmdOptifine(msg, arguments) {
 	switch (arguments[0]) {
 		case 'download':
-			embeds.answer(msg.channel, 'https://optifine.net/downloads', 'Optifine Download', 'https://optifine.net/downloads', true);
+			embeds.answer(
+				msg.channel,
+				'https://optifine.net/downloads',
+				'Optifine Download',
+				'https://optifine.net/downloads',
+				true
+			);
 			break;
 		case 'server':
 			embeds.answer(
@@ -99,12 +111,17 @@ function cmdChannel(msg, arguments, author) {
 
 				// delete all previous permissions
 				if (dataJSON.channel[msg.channel].devsID) {
-					msg.channel.permissionOverwrites.filter((element) => dataJSON.channel[msg.channel].devsID.includes(element.id)).deleteAll();
+					msg.channel.permissionOverwrites
+						.filter((element) => dataJSON.channel[msg.channel].devsID.includes(element.id))
+						.deleteAll();
 				}
 
 				dataJSON.channel[msg.channel].devsID = channelDevs;
 				updateJSON(dataJSON, () => {
-					embeds.feedback(msg.channel, `Linked <@${dataJSON.channel[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`);
+					embeds.feedback(
+						msg.channel,
+						`Linked <@${dataJSON.channel[msg.channel].devsID.join('>, <@')}> with ${msg.channel}.`
+					);
 				});
 
 				// set permissions
@@ -122,7 +139,9 @@ function cmdChannel(msg, arguments, author) {
 			else if (dataJSON.channel[msg.channel]) {
 				// delete all permissions
 				if (dataJSON.channel[msg.channel].devsID) {
-					msg.channel.permissionOverwrites.filter((element) => dataJSON.channel[msg.channel].devsID.includes(element.id)).deleteAll();
+					msg.channel.permissionOverwrites
+						.filter((element) => dataJSON.channel[msg.channel].devsID.includes(element.id))
+						.deleteAll();
 				}
 
 				delete dataJSON.channel[msg.channel];
@@ -168,7 +187,10 @@ function cmdChannel(msg, arguments, author) {
 		case 'info':
 			var channelData = dataJSON.channel[msg.channel];
 			if (channelData) {
-				embeds.feedback(msg.channel, `Channel: ${msg.channel}\nDeveloper: <@${channelData.devsID.join('>, <@')}>`);
+				embeds.feedback(
+					msg.channel,
+					`Channel: ${msg.channel}\nDeveloper: <@${channelData.devsID.join('>, <@')}>`
+				);
 			} else {
 				embeds.error(msg.channel, `${msg.channel} is not initialized.`);
 			}
@@ -191,7 +213,13 @@ function cmdDownload(msg) {
 		if (!values.link) values.link = '';
 		if (!values.thumbnail) values.thumbnail = [ '', '' ];
 
-		embeds.answer(msg.channel, `${values.text}\n${values.link}`, 'Download', values.thumbnail[0], values.thumbnail[1] === 'true' ? true : false);
+		embeds.answer(
+			msg.channel,
+			`${values.text}\n${values.link}`,
+			'Download',
+			values.thumbnail[0],
+			values.thumbnail[1] === 'true' ? true : false
+		);
 	} catch (error) {
 		embeds.error(msg.channel, '`!download` was not configured by the developer(s).');
 	}
