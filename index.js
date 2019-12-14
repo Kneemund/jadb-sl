@@ -29,7 +29,8 @@ var cmdObject = {
 	optifine: cmdOptifine,
 	channel: cmdChannel,
 	download: cmdDownload,
-	purge: cmdPurge
+	purge: cmdPurge,
+	lockdown: cmdLockdown
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -244,11 +245,75 @@ function cmdPurge(msg, arguments, author) {
 	msg.channel
 		.bulkDelete(arguments[0])
 		.then((messages) => {
-			embeds.feedback(msg.channel, `Deleted ${messages.size}/${arguments[0]} messages.`, '', 5000);
+			embeds.feedback(msg.channel, `Deleted \`${messages.size}\`/\`${arguments[0]}\` messages.`, '', 5000);
 		})
 		.catch((err) => {
 			if (err) console.error(err);
 		});
+}
+
+function cmdLockdown(msg, arguments, author) {
+	if (!getAuthorized(author)) return embeds.errorAuthorized(msg.channel);
+	switch (arguments[0]) {
+		case undefined:
+			var whitelistRoles = author.guild.roles.filter((role) => config.lockdownWhitelistRoleIDs.includes(role.id));
+
+			whitelistRoles.forEach((whitelistRole) => {
+				var existingOverwrites = msg.channel.permissionOverwrites.get(whitelistRole.id);
+
+				if (!existingOverwrites) {
+					msg.channel.overwritePermissions(whitelistRole, {
+						SEND_MESSAGES: true
+					});
+				} else if ((existingOverwrites.deny & 0x800) != 0x800 && (existingOverwrites.allow & 0x800) != 0x800) {
+					// check if "SEND_MESSAGES" is NOT already denied or allowed
+					msg.channel.overwritePermissions(whitelistRole, {
+						SEND_MESSAGES: true
+					});
+				}
+			});
+
+			msg.channel.overwritePermissions(msg.guild.id, {
+				SEND_MESSAGES: false
+			});
+
+			embeds.feedback(msg.channel, `${msg.channel} was locked.`);
+			break;
+		case 'remove':
+			var whitelistRoles = author.guild.roles.filter((role) => config.lockdownWhitelistRoleIDs.includes(role.id));
+
+			whitelistRoles.forEach((whitelistRole) => {
+				var existingOverwrites = msg.channel.permissionOverwrites.get(whitelistRole.id);
+
+				if (existingOverwrites) {
+					// remove "SEND_MESSAGES" if it's allowed and NOT denied
+					if ((existingOverwrites.deny & 0x800) != 0x800 && (existingOverwrites.allow & 0x800) == 0x800) {
+						msg.channel.overwritePermissions(whitelistRole, {
+							SEND_MESSAGES: null
+						});
+					}
+
+					// delete whole permission overwrite if everything is null/default or if "SEND_MESSAGES" is the only thing that's allowed
+					if (
+						(existingOverwrites.type === 'role' &&
+							(existingOverwrites.allow === 0 && existingOverwrites.deny === 0)) ||
+						(existingOverwrites.allow == 0x800 && existingOverwrites.deny === 0)
+					) {
+						existingOverwrites.delete();
+					}
+				}
+			});
+
+			msg.channel.overwritePermissions(msg.guild.id, {
+				SEND_MESSAGES: null
+			});
+
+			embeds.feedback(msg.channel, `${msg.channel} was unlocked.`);
+			break;
+		default:
+			embeds.errorSyntax(msg.channel, '`!lockdown [remove]`');
+			return;
+	}
 }
 
 function cmdInvalid(msg, _arguments, invoke) {

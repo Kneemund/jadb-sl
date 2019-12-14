@@ -99,11 +99,13 @@ module.exports = {
 							'`!wiki`\n' +
 							'Link to the official shader wiki.\n\n' +
 							'`!optifine `­`<­`­`download`|`server`­`>`\n' +
-							'Links to optifine-related stuff.\n\n' +
+							'Links related to Optifine.\n\n' +
 							'`!channel `­`<­`­`info`|__`config`__|__`init`__|__`reset`__`>`\n' +
 							'Commands to manage and get information about channels.\n\n' +
 							'__`!purge`__` <`­`amount`­`>`\n' +
-							'Delete up to 100 messages at a time that are less than 2 weeks old.'
+							'Delete up to 100 messages at a time that are less than 2 weeks old.\n\n' +
+							'__`!lockdown`__` [`­`remove`­`]`\n' +
+							'Lock the current channel for every role that is not whitelisted.'
 					}
 				],
 				thumbnail: {
