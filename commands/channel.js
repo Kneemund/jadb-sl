@@ -1,17 +1,15 @@
 const embeds = require('../util/embeds.js');
 const JSON = require('../util/JSON.js');
-const auth = require('../util/auth.js');
 
 function cmdInit(client, message) {
-	if (!auth.getAuthorized(client, message)) embeds.errorAuthorized(message.channel, '');
-	else if (message.mentions.users.first()) {
+	if (message.mentions.users.first()) {
 		if (!client.dataJSON.channel[message.channel]) client.dataJSON.channel[message.channel] = {};
 		var channelDevs = message.mentions.users.keyArray();
 
 		// delete all previous permissions
 		if (client.dataJSON.channel[message.channel].devsID) {
 			message.channel.permissionOverwrites
-				.filter((element) => client.dataJSON.channel[message.channel].devsID.includes(element.id))
+				.filter(element => client.dataJSON.channel[message.channel].devsID.includes(element.id))
 				.deleteAll();
 		}
 
@@ -24,23 +22,22 @@ function cmdInit(client, message) {
 		});
 
 		// set permissions
-		channelDevs.forEach((element) => {
+		channelDevs.forEach(element => {
 			message.channel.overwritePermissions(element, {
 				MANAGE_CHANNELS: true
 			});
 		});
 	} else {
-		embeds.errorSyntax(message.channel, '`!channel init @developer [...]`');
+		embeds.errorSyntax(message.channel, `\`${client.config.prefix}channel init @developer [...]\``);
 	}
 }
 
 function cmdReset(client, message) {
-	if (!auth.getAuthorized(client, message)) embeds.errorAuthorized(message.channel, '');
-	else if (client.dataJSON.channel[message.channel]) {
+	if (client.dataJSON.channel[message.channel]) {
 		// delete all permissions
 		if (client.dataJSON.channel[message.channel].devsID) {
 			message.channel.permissionOverwrites
-				.filter((element) => client.dataJSON.channel[message.channel].devsID.includes(element.id))
+				.filter(element => client.dataJSON.channel[message.channel].devsID.includes(element.id))
 				.deleteAll();
 		}
 
@@ -54,9 +51,7 @@ function cmdReset(client, message) {
 }
 
 function cmdConfig(client, message, args) {
-	if (!auth.getDev(client, message) && !auth.getAuthorized(client, message))
-		embeds.errorAuthorized(message.channel, '');
-	else if (!client.dataJSON.channel[message.channel])
+	if (!client.dataJSON.channel[message.channel])
 		embeds.error(message.channel, `${message.channel} is not initialized.`);
 	else {
 		var value = args.slice(2);
@@ -78,7 +73,7 @@ function cmdConfig(client, message, args) {
 				});
 				return;
 			default:
-				embeds.errorSyntax(message.channel, '`!channel config <text|link|thumbnail>`');
+				embeds.errorSyntax(message.channel, `\`${client.config.prefix}channel config <text|link|thumbnail>\``);
 				return;
 		}
 
@@ -100,7 +95,7 @@ function cmdInfo(client, message) {
 	}
 }
 
-const subCommands = {
+exports.subCommands = {
 	init: cmdInit,
 	reset: cmdReset,
 	config: cmdConfig,
@@ -108,12 +103,17 @@ const subCommands = {
 };
 
 exports.help = {
-	syntax: `!channel <${Object.keys(subCommands).join('|')}>`,
+	syntax: `channel <${Object.keys(this.subCommands).join('|')}>`,
 	category: 'moderation',
-	description: 'Commands to manage and get information about channels..'
+	required: {
+		init: 'MANAGE_ROLES',
+		reset: 'MANAGE_ROLES',
+		config: 'MANAGE_CHANNELS',
+		info: undefined
+	},
+	description: 'Commands to manage and get information about channels.'
 };
 
 exports.run = (client, message, args) => {
-	if (args[0] in subCommands) subCommands[args[0]](client, message, args);
-	else embeds.errorSyntax(message.channel, `\`${this.help.syntax}\``);
+	this.subCommands[args[0]](client, message, args);
 };

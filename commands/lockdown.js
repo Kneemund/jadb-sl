@@ -1,12 +1,11 @@
 const embeds = require('../util/embeds.js');
-const auth = require('../util/auth.js');
 
 function cmdMain(client, message) {
-	var whitelistRoles = message.member.guild.roles.filter((role) =>
+	var whitelistRoles = message.member.guild.roles.filter(role =>
 		client.config.lockdownWhitelistRoleIDs.includes(role.id)
 	);
 
-	whitelistRoles.forEach((whitelistRole) => {
+	whitelistRoles.forEach(whitelistRole => {
 		var currOverwrites = message.channel.permissionOverwrites.get(whitelistRole.id);
 
 		if (!currOverwrites) {
@@ -29,11 +28,11 @@ function cmdMain(client, message) {
 }
 
 function cmdRemove(client, message) {
-	var whitelistRoles = message.member.guild.roles.filter((role) =>
+	var whitelistRoles = message.member.guild.roles.filter(role =>
 		client.config.lockdownWhitelistRoleIDs.includes(role.id)
 	);
 
-	whitelistRoles.forEach((whitelistRole) => {
+	whitelistRoles.forEach(whitelistRole => {
 		var currOverwrites = message.channel.permissionOverwrites.get(whitelistRole.id);
 
 		if (currOverwrites) {
@@ -61,20 +60,18 @@ function cmdRemove(client, message) {
 	embeds.feedback(message.channel, `${message.channel} was unlocked.`);
 }
 
-const subCommands = {
+exports.subCommands = {
 	undefined: cmdMain,
 	remove: cmdRemove
 };
 
 exports.help = {
-	syntax: '!lockdown [remove]',
+	syntax: 'lockdown [remove]',
 	category: 'moderation',
+	required: 'MANAGE_CHANNELS',
 	description: 'Locks the current channel for every role that is not whitelisted.'
 };
 
 exports.run = (client, message, args) => {
-	if (!auth.getAuthorized(client, message)) return embeds.errorAuthorized(message.channel);
-
-	if (args[0] in subCommands) subCommands[args[0]](client, message);
-	else embeds.errorSyntax(message.channel, this.help.syntax);
+	this.subCommands[args[0]](client, message);
 };

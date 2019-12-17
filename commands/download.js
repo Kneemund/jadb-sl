@@ -1,8 +1,9 @@
 const embeds = require('../util/embeds.js');
 
 exports.help = {
-	syntax: '!download',
+	syntax: 'download',
 	category: 'user',
+	required: undefined,
 	description: 'Get the channel-specific download link.'
 };
 
@@ -26,6 +27,9 @@ exports.run = (client, message) => {
 			values.thumbnail[1] === 'true' ? true : false
 		);
 	} catch (error) {
-		embeds.error(message.channel, `\`${this.help.syntax}\` was not configured by the developer(s).`);
+		embeds.error(
+			message.channel,
+			`\`${client.config.prefix}${this.help.syntax}\` was not configured by the developer(s).`
+		);
 	}
 };

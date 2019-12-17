@@ -1,14 +1,16 @@
+const { Attachment } = require('discord.js');
 const embeds = require('../util/embeds.js');
 
-function includeReply(message) {
-	if (message.content.toLowerCase().includes('no u')) message.channel.send('no u');
-	if (message.content.toLowerCase().includes('rip'))
-		message.channel.send('https://cdn1.tnwcdn.com/wp-content/blogs.dir/1/files/2013/11/rip-786x305.jpg');
+function messageTriggers(message) {
+	if (message.content.toLowerCase().includes('no u ') || message.content.toLowerCase().includes('no u ') === 'no u')
+		message.channel.send('no u');
+	if (message.content.toLowerCase().split(' ').includes('rip'))
+		message.channel.send(new Attachment('https://i.postimg.cc/mk2yHfRV/rip.jpg'));
 }
 
 module.exports = (client, message) => {
 	if (message.author.bot) return;
-	includeReply(message);
+	messageTriggers(message);
 	if (!message.content.startsWith(client.config.prefix)) return;
 
 	const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
@@ -16,6 +18,30 @@ module.exports = (client, message) => {
 
 	const cmd = client.commands.get(command);
 
-	if (!cmd) return embeds.error(message.channel, `The command \`!${command}\` doesn't exist.`, 'INVALID COMMAND');
+	if (!cmd)
+		return embeds.error(
+			message.channel,
+			`The command \`${client.config.prefix}${command}\` doesn't exist.`,
+			'INVALID COMMAND'
+		);
+
+	if (cmd.subCommands) {
+		if (!(args[0] in cmd.subCommands)) {
+			return embeds.errorSyntax(message.channel, client.config.prefix + cmd.help.syntax);
+		}
+
+		if (cmd.help.required[args[0]]) {
+			if (!message.member.permissionsIn(message.channel).has(cmd.help.required[args[0]])) {
+				return embeds.errorAuthorized(message.channel, '', cmd.help.required[args[0]]);
+			}
+		}
+	} else {
+		if (cmd.help.required) {
+			if (!message.member.permissionsIn(message.channel).has(cmd.help.required)) {
+				return embeds.errorAuthorized(message.channel, '', cmd.help.required);
+			}
+		}
+	}
+
 	cmd.run(client, message, args);
 };

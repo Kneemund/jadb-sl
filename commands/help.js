@@ -1,13 +1,30 @@
+const embeds = require('../util/embeds.js');
+const commandsPerPage = 6;
+
 exports.help = {
-	syntax: '!help',
+	syntax: 'help [page]',
 	category: 'user',
+	required: undefined,
 	description: 'Displays this help section.'
 };
 
-exports.run = (client, message) => {
+exports.run = (client, message, args) => {
+	let commands = client.commands.keyArray();
+
+	const page = args[0] - 1 || 0;
+	const maxPages = Math.ceil(commands.length / commandsPerPage);
+	this.help.syntax = `help [1-${maxPages}]`;
+
+	if (page > maxPages) return embeds.errorSyntax(message.channel, `${client.config.prefix}${this.help.syntax}`);
+
+	commands = commands.slice(commandsPerPage * page, commandsPerPage * (page + 1));
+
 	let commandString = '';
-	client.commands.forEach((command) => {
-		if (command.help) commandString = commandString + `\`${command.help.syntax}\`\n${command.help.description}\n\n`;
+	commands.forEach(commandName => {
+		let command = client.commands.get(commandName);
+		if (command.help)
+			commandString =
+				commandString + `\`${client.config.prefix}${command.help.syntax}\`\n${command.help.description}\n\n`;
 	});
 
 	const embed = {
@@ -17,7 +34,6 @@ exports.run = (client, message) => {
 			description: '',
 			fields: [
 				{
-					// "ALT + 0173" FOR CREATING AN EMPTY SPACE TO SEPERATE `MSG``MSG`
 					name: 'COMMANDS',
 					value: commandString
 				}
@@ -26,7 +42,7 @@ exports.run = (client, message) => {
 				url: message.guild.iconURL
 			},
 			footer: {
-				text: 'Underlined Commands are only for Admins/Developers'
+				text: `Currently viewing page ${page + 1} of ${maxPages}`
 			}
 		}
 	};

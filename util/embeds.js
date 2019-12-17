@@ -15,9 +15,7 @@ module.exports = {
 			}
 		};
 
-		channel.send('', config).then((msg) => {
-			return msg;
-		});
+		channel.send('', config);
 	},
 
 	errorSyntax(channel, syntax) {
@@ -29,23 +27,22 @@ module.exports = {
 			}
 		};
 
-		channel.send('', config).then((msg) => {
-			return msg;
-		});
+		channel.send('', config);
 	},
 
-	errorAuthorized(channel, command) {
+	errorAuthorized(channel, command, missingPermissions) {
 		var config = {
 			embed: {
 				color: COLORS.red,
 				description: command,
-				title: 'INSUFFICIENT PERMISSIONS'
+				title: 'INSUFFICIENT PERMISSIONS',
+				footer: {
+					text: `Missing permissions: ${missingPermissions}`
+				}
 			}
 		};
 
-		channel.send('', config).then((msg) => {
-			return msg;
-		});
+		channel.send('', config);
 	},
 
 	feedback(channel, content, title, timeout) {
@@ -57,9 +54,27 @@ module.exports = {
 			}
 		};
 
-		channel.send('', config).then((msg) => {
+		channel.send('', config).then(msg => {
 			if (timeout) msg.delete(timeout);
 		});
+	},
+
+	feedbackReason(channel, content, title, field_value) {
+		var config = {
+			embed: {
+				color: COLORS.green,
+				description: content,
+				title: title,
+				fields: [
+					{
+						name: 'REASON',
+						value: field_value
+					}
+				]
+			}
+		};
+
+		channel.send('', config);
 	},
 
 	answer(channel, content, title, thumbnailURL, thumbnailFromDomain) {
@@ -76,8 +91,6 @@ module.exports = {
 			}
 		};
 
-		channel.send('', config).then((msg) => {
-			return msg;
-		});
+		channel.send('', config);
 	}
 };

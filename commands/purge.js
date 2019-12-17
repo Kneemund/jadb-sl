@@ -1,17 +1,15 @@
 const embeds = require('../util/embeds.js');
-const auth = require('../util/auth.js');
 
 exports.help = {
-	syntax: '!purge <amount>',
+	syntax: 'purge <amount>',
 	category: 'moderation',
+	required: 'MANAGE_MESSAGES',
 	description: 'Delete up to 100 messages at a time that are less than 2 weeks old.'
 };
 
 exports.run = (client, message, args) => {
-	if (!auth.getAuthorized(client, message)) return embeds.errorAuthorized(message.channel);
-
 	if (isNaN(args[0]) || args[0] < 1 || args[0] != Math.floor(args[0])) {
-		return embeds.errorSyntax(message.channel, this.syntax);
+		return embeds.errorSyntax(message.channel, client.config.prefix + this.help.syntax);
 	}
 
 	if (args[0] > 100) {
@@ -19,11 +17,11 @@ exports.run = (client, message, args) => {
 	}
 
 	message.channel
-		.bulkDelete(args[0])
-		.then((messages) => {
+		.bulkDelete(args[0], true)
+		.then(messages => {
 			embeds.feedback(message.channel, `Deleted \`${messages.size}\`/\`${args[0]}\` messages.`, '', 5000);
 		})
-		.catch((err) => {
+		.catch(err => {
 			if (err) console.error(err);
 		});
 };

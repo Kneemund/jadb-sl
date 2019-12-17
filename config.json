@@ -1,8 +1,8 @@
 {
-	"owner": "264109085174005770",
-	"prefix": "!",
-	"autoRoleID": "649689512070610946",
-	"adminRoleID": "649708323918184448",
-	"sortCategoryIDs": [ "649677432525291533", "650745877551644695" ],
-	"lockdownWhitelistRoleIDs": [ "649708323918184448" ]
+  "prefix": "!",
+  "owner": "264109085174005770",
+  "autoRoleID": "649689512070610946",
+  "adminRoleID": "649708323918184448",
+  "sortCategoryIDs": ["649677432525291533", "650745877551644695"],
+  "lockdownWhitelistRoleIDs": ["649708323918184448"]
 }

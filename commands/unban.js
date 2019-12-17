@@ -1,33 +1,33 @@
 const embeds = require('../util/embeds.js');
-const auth = require('../util/auth.js');
 
 exports.help = {
-	syntax: '!unban <user> <reason>',
+	syntax: 'unban <user> <reason>',
 	category: 'moderation',
+	required: 'BAN_MEMBERS',
 	description: 'Unban a user.'
 };
 
 exports.run = (client, message, args) => {
-	if (!auth.getAuthorized(client, message)) return embeds.errorAuthorized(message.channel);
-	if (!args[0] || !args[1]) return embeds.errorSyntax(message.channel, this.help.syntax);
+	if (!args[0] || !args[1]) return embeds.errorSyntax(message.channel, client.config.prefix + this.help.syntax);
 
 	const userID = args[0].replace(/[<@!>]/g, '');
 	const reason = args.slice(1).join(' ');
 
 	message.guild
 		.fetchBan(userID)
-		.then((ban) => {
+		.then(ban => {
 			if (ban) {
 				message.guild
 					.unban(userID, reason)
 					.then(
-						embeds.feedback(
+						embeds.feedbackReason(
 							message.channel,
-							`${message.author} unbanned <@!${userID}>\nReason: ${reason}`,
-							'UNBAN'
+							`${message.author} unbanned <@!${userID}>`,
+							'UNBAN',
+							reason
 						)
 					)
-					.catch((err) => {
+					.catch(err => {
 						console.error(err);
 					});
 			} else {

@@ -1,58 +1,56 @@
 const discord = require('discord.js');
 const fs = require('fs');
-const request = require('request');
+const JSONHandler = require('./util/JSON.js');
 
-// require('dotenv').config();
+require('dotenv').config();
 
-var client = new discord.Client();
-
-const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-client.config = config;
-
-const optionsGET = {
-	url: 'https://api.jsonbin.io/b/5de15b063da40e6f299214b9/latest',
-	json: true,
-	headers: {
-		'secret-key': process.env.JSON
-	}
-};
-
-request.get(optionsGET, (error, _response, body) => {
-	if (error) console.error(error);
-	client.dataJSON = body;
+var client = new discord.Client({
+	disableEveryone: true,
+	disabledEvents: [ 'TYPING_START' ]
 });
+
+// client.config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+// ASYNC
+JSONHandler.getConfig(client);
+JSONHandler.getData(client);
 
 fs.readdir('./events/', (err, files) => {
 	if (err) return console.error(err);
-	console.log('---EVENTS---');
-	files.forEach((file) => {
+	let loadSuccess = [];
+	let loadFail = [];
+	files.forEach(file => {
 		let eventName = file.split('.')[0];
 		try {
 			const event = require(`./events/${file}`);
 			client.on(eventName, event.bind(null, client));
-			console.log(`✅  ${eventName}`);
+			loadSuccess.push(eventName);
 		} catch (err) {
-			console.log(`❌  ${eventName}`);
+			loadFail.push(eventName);
 		}
 	});
+
+	console.log('---EVENTS---');
+	console.log(`✅  ${loadSuccess.join(', ') || 'NONE'}\n❌  ${loadFail.join(', ') || 'NONE'}`);
 });
 
 client.commands = new discord.Collection();
 
 fs.readdir('./commands/', (err, files) => {
 	if (err) return console.error(err);
-	console.log('---COMMANDS---');
-	files.forEach((file) => {
+	let loadFail = [];
+	files.forEach(file => {
 		let commandName = file.split('.')[0];
 		try {
 			if (!file.endsWith('.js')) return;
 			let props = require(`./commands/${file}`);
-			console.log(`✅  ${commandName}`);
 			client.commands.set(commandName, props);
 		} catch (err) {
-			console.log(`❌  ${commandName}`);
+			loadFail.push(commandName);
 		}
 	});
+
+	console.log('---COMMANDS---');
+	console.log(`✅  ${client.commands.keyArray().join(', ') || 'NONE'}\n❌  ${loadFail.join(', ') || 'NONE'}`);
 });
 
 client.login(process.env.TOKEN);

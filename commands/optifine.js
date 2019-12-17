@@ -20,18 +20,21 @@ function cmdServer(message) {
 	);
 }
 
-const subCommands = {
+exports.subCommands = {
 	download: cmdDownload,
 	server: cmdServer
 };
 
 exports.help = {
-	syntax: `!optifine <${Object.keys(subCommands).join('|')}>`,
+	syntax: `optifine <${Object.keys(this.subCommands).join('|')}>`,
 	category: 'user',
+	required: {
+		download: undefined,
+		server: undefined
+	},
 	description: 'Links related to Optifine.'
 };
 
 exports.run = (_client, message, args) => {
-	if (args[0] in subCommands) subCommands[args[0]](message);
-	else embeds.errorSyntax(message.channel, this.help.syntax);
+	this.subCommands[args[0]](message);
 };

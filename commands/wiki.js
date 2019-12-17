@@ -1,8 +1,9 @@
 const embeds = require('../util/embeds.js');
 
 exports.help = {
-	syntax: '!wiki',
+	syntax: 'wiki',
 	category: 'user',
+	required: undefined,
 	description: 'Link to the official shader wiki.'
 };
 
