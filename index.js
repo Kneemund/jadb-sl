@@ -1,7 +1,7 @@
 const discord = require('discord.js');
 const fs = require('fs');
 
-require('dotenv').config();
+// require('dotenv').config();
 
 var client = new discord.Client({
 	disableEveryone: true,
