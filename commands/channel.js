@@ -1,95 +1,90 @@
 const embeds = require('../util/embeds.js');
-const JSON = require('../util/JSON.js');
+const firestore = require('../api/firestore.js');
 
-function cmdInit(client, message) {
+async function cmdInit(client, message) {
 	if (message.mentions.users.first()) {
-		if (!client.dataJSON.channel[message.channel]) client.dataJSON.channel[message.channel] = {};
-		var channelDevs = message.mentions.users.keyArray();
+		const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
+		const channelDev = message.mentions.users.keyArray();
 
-		// delete all previous permissions
-		if (client.dataJSON.channel[message.channel].devsID) {
-			message.channel.permissionOverwrites
-				.filter(element => client.dataJSON.channel[message.channel].devsID.includes(element.id))
-				.deleteAll();
+		if (channelData) {
+			if (channelData.dev) {
+				message.channel.permissionOverwrites
+					.filter(element => channelData.dev.includes(element.id))
+					.deleteAll();
+			}
 		}
 
-		client.dataJSON.channel[message.channel].devsID = channelDevs;
-		JSON.update(client.dataJSON, () => {
-			embeds.feedback(
-				message.channel,
-				`Linked <@${client.dataJSON.channel[message.channel].devsID.join('>, <@')}> with ${message.channel}.`
-			);
-		});
+		firestore.updateChannel(message.guild.id, message.channel.id, { dev: channelDev });
 
-		// set permissions
-		channelDevs.forEach(element => {
+		channelDev.forEach(element => {
 			message.channel.overwritePermissions(element, {
-				MANAGE_CHANNELS: true
+				MANAGE_CHANNELS: true,
+				MANAGE_WEBHOOKS: true,
+				SEND_MESSAGES: true
 			});
 		});
+
+		embeds.feedback(message.channel, `Linked <@${channelDev.join('>, <@')}> with ${message.channel}.`);
 	} else {
-		embeds.errorSyntax(message.channel, `\`${client.config.prefix}channel init @developer [...]\``);
+		embeds.errorSyntax(message.channel, `\`${client[message.guild.id].prefix}channel init @developer [...]\``);
 	}
 }
 
-function cmdReset(client, message) {
-	if (client.dataJSON.channel[message.channel]) {
-		// delete all permissions
-		if (client.dataJSON.channel[message.channel].devsID) {
-			message.channel.permissionOverwrites
-				.filter(element => client.dataJSON.channel[message.channel].devsID.includes(element.id))
-				.deleteAll();
+async function cmdReset(client, message) {
+	const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
+	if (channelData) {
+		if (channelData.dev) {
+			message.channel.permissionOverwrites.filter(element => channelData.dev.includes(element.id)).deleteAll();
 		}
 
-		delete client.dataJSON.channel[message.channel];
-		JSON.update(client.dataJSON, () => {
-			embeds.feedback(message.channel, `${message.channel} was reset.`);
-		});
+		firestore.deleteChannel(message.guild.id, message.channel.id);
+		embeds.feedback(message.channel, `${message.channel} was reset.`);
 	} else {
 		embeds.error(message.channel, `${message.channel} is not initialized.`);
 	}
 }
 
-function cmdConfig(client, message, args) {
-	if (!client.dataJSON.channel[message.channel])
-		embeds.error(message.channel, `${message.channel} is not initialized.`);
-	else {
+async function cmdConfig(client, message, args) {
+	const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
+	if (channelData) {
 		var value = args.slice(2);
-		if (!client.dataJSON.channel[message.channel].download) client.dataJSON.channel[message.channel].download = {};
 		switch (args[1]) {
 			case 'text':
-				client.dataJSON.channel[message.channel].download.text = value.join(' ');
+				firestore.updateChannel(message.guild.id, message.channel.id, { download: { text: value.join(' ') } });
 				break;
 			case 'link':
-				client.dataJSON.channel[message.channel].download.link = value[0];
+				firestore.updateChannel(message.guild.id, message.channel.id, { download: { link: value[0] } });
 				break;
 			case 'thumbnail':
-				client.dataJSON.channel[message.channel].download.thumbnail = [ value[0], value[1] ];
+				firestore.updateChannel(message.guild.id, message.channel.id, {
+					download: { thumbnail: value[0], favicon: value[1] }
+				});
 				break;
 			case 'reset':
-				client.dataJSON.channel[message.channel].download = {};
-				JSON.update(client.dataJSON, () => {
-					embeds.feedback(message.channel, `\`!download\` of ${message.channel} was reset.`);
+				firestore.updateChannel(message.guild.id, message.channel.id, {
+					download: firestore.deleteField()
 				});
+
+				embeds.feedback(message.channel, `\`!download\` of ${message.channel} was reset.`);
 				return;
 			default:
-				embeds.errorSyntax(message.channel, `\`${client.config.prefix}channel config <text|link|thumbnail>\``);
+				embeds.errorSyntax(
+					message.channel,
+					`\`${client[message.guild.id].prefix}channel config <text|link|thumbnail>\``
+				);
 				return;
 		}
-
-		JSON.update(client.dataJSON, () => {
-			embeds.feedback(message.channel, `The ${args[1]} of ${message.channel} was updated.`);
-		});
+		embeds.feedback(message.channel, `Updated ${args[1]} of ${message.channel}.`);
+	} else {
+		embeds.error(message.channel, `${message.channel} is not initialized.`);
 	}
 }
 
-function cmdInfo(client, message) {
-	var channelData = client.dataJSON.channel[message.channel];
+async function cmdInfo(client, message) {
+	const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
+
 	if (channelData) {
-		embeds.feedback(
-			message.channel,
-			`Channel: ${message.channel}\nDeveloper: <@${channelData.devsID.join('>, <@')}>`
-		);
+		embeds.feedback(message.channel, `Channel: ${message.channel}\nDeveloper: <@${channelData.dev.join('>, <@')}>`);
 	} else {
 		embeds.error(message.channel, `${message.channel} is not initialized.`);
 	}

@@ -9,7 +9,7 @@ exports.help = {
 
 exports.run = (client, message, args) => {
 	if (isNaN(args[0]) || args[0] < 1 || args[0] != Math.floor(args[0])) {
-		return embeds.errorSyntax(message.channel, client.config.prefix + this.help.syntax);
+		return embeds.errorSyntax(message.channel, client[message.guild.id].prefix + this.help.syntax);
 	}
 
 	if (args[0] > 100) {

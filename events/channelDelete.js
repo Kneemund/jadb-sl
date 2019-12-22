@@ -1,8 +1,9 @@
-const JSON = require('../util/JSON.js');
+const firestore = require('../api/firestore.js');
 
 module.exports = (client, channel) => {
-	if (client.dataJSON.channel[channel]) {
-		delete client.dataJSON.channel[channel];
-		JSON.update(client.dataJSON);
-	}
+	// firestore.getChannel(channel.guild.id, channel.id).then(snapshot => {
+	// 	if(snapshot.exists()) firestore.deleteChannel(channel.guild.id, channel.id);
+	// });
+
+	firestore.deleteChannel(channel.guild.id, channel.id);
 };

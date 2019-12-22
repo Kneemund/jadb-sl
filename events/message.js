@@ -11,9 +11,9 @@ function messageTriggers(message) {
 module.exports = (client, message) => {
 	if (message.author.bot) return;
 	messageTriggers(message);
-	if (!message.content.startsWith(client.config.prefix)) return;
+	if (!message.content.startsWith(client[message.guild.id].prefix)) return;
 
-	const args = message.content.slice(client.config.prefix.length).trim().split(/ +/g);
+	const args = message.content.slice(client[message.guild.id].prefix.length).trim().split(/ +/g);
 	const command = args.shift().toLowerCase();
 
 	const cmd = client.commands.get(command);
@@ -21,13 +21,13 @@ module.exports = (client, message) => {
 	if (!cmd)
 		return embeds.error(
 			message.channel,
-			`The command \`${client.config.prefix}${command}\` doesn't exist.`,
+			`The command \`${client[message.guild.id].prefix}${command}\` doesn't exist.`,
 			'INVALID COMMAND'
 		);
 
 	if (cmd.subCommands) {
 		if (!(args[0] in cmd.subCommands)) {
-			return embeds.errorSyntax(message.channel, client.config.prefix + cmd.help.syntax);
+			return embeds.errorSyntax(message.channel, client[message.guild.id].prefix + cmd.help.syntax);
 		}
 
 		if (cmd.help.required[args[0]]) {

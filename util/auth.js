@@ -1,10 +1,13 @@
+const firestore = require('../api/firestore.js');
+
 // exports.getAuthorized = (client, message) => {
-// 	return Boolean(message.member.roles.get(client.config.adminRoleID));
+// 	return Boolean(message.member.roles.get(client[message.guild.id].adminRoleID));
 // };
 
-exports.getDev = (client, message) => {
+exports.getDev = async (_client, message) => {
 	try {
-		return client.dataJSON.channel[message.channel].devsID.includes(message.member.id);
+		const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
+		return channelData.dev.includes(message.member.id);
 	} catch (error) {
 		return false;
 	}

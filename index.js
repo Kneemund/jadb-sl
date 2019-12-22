@@ -1,18 +1,12 @@
 const discord = require('discord.js');
 const fs = require('fs');
-const JSONHandler = require('./util/JSON.js');
 
-// require('dotenv').config();
+require('dotenv').config();
 
 var client = new discord.Client({
 	disableEveryone: true,
 	disabledEvents: [ 'TYPING_START' ]
 });
-
-// client.config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-// ASYNC
-JSONHandler.getConfig(client);
-JSONHandler.getData(client);
 
 fs.readdir('./events/', (err, files) => {
 	if (err) return console.error(err);

@@ -11,6 +11,8 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^11.5.1",
+    "firebase-admin": "^8.8.0",
+    "para-client-js": "^1.33.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"
   },

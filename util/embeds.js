@@ -11,7 +11,11 @@ module.exports = {
 			embed: {
 				color: COLORS.red,
 				description: content,
-				title: title
+				title: '',
+				author: {
+					name: title || 'ERROR',
+					icon_url: 'https://img.icons8.com/color/48/000000/cancel--v1.png'
+				}
 			}
 		};
 
@@ -23,7 +27,11 @@ module.exports = {
 			embed: {
 				color: COLORS.red,
 				description: `\`${syntax}\``,
-				title: 'SYNTAX ERROR'
+				title: '',
+				author: {
+					name: 'SYNTAX ERROR',
+					icon_url: 'https://img.icons8.com/color/48/000000/cancel--v1.png'
+				}
 			}
 		};
 
@@ -35,9 +43,13 @@ module.exports = {
 			embed: {
 				color: COLORS.red,
 				description: command,
-				title: 'INSUFFICIENT PERMISSIONS',
+				title: '',
 				footer: {
 					text: `Missing permissions: ${missingPermissions}`
+				},
+				author: {
+					name: 'INSUFFICIENT PERMISSIONS',
+					icon_url: 'https://img.icons8.com/color/48/000000/cancel--v1.png'
 				}
 			}
 		};
@@ -50,7 +62,11 @@ module.exports = {
 			embed: {
 				color: COLORS.green,
 				description: content,
-				title: title
+				title: title,
+				author: {
+					name: title || 'SUCCESS',
+					icon_url: 'https://img.icons8.com/color/48/000000/ok--v1.png'
+				}
 			}
 		};
 
@@ -64,29 +80,37 @@ module.exports = {
 			embed: {
 				color: COLORS.green,
 				description: content,
-				title: title,
+				title: '',
 				fields: [
 					{
 						name: 'REASON',
 						value: field_value
 					}
-				]
+				],
+				author: {
+					name: title || 'SUCCESS',
+					icon_url: 'https://img.icons8.com/color/48/000000/ok--v1.png'
+				}
 			}
 		};
 
 		channel.send('', config);
 	},
 
-	answer(channel, content, title, thumbnailURL, thumbnailFromDomain) {
+	answer(channel, content, title, thumbnailURL, thumbnailFromDomain, iconURL) {
 		var config = {
 			embed: {
 				color: COLORS.blue,
 				description: content,
-				title: title,
+				title: '',
 				thumbnail: {
 					url: thumbnailFromDomain
 						? `https://plus.google.com/_/favicon?domain_url=${thumbnailURL}`
 						: thumbnailURL
+				},
+				author: {
+					name: title,
+					icon_url: iconURL
 				}
 			}
 		};

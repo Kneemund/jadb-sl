@@ -8,7 +8,8 @@ exports.help = {
 };
 
 exports.run = (client, message, args) => {
-	if (!args[0] || !args[1]) return embeds.errorSyntax(message.channel, client.config.prefix + this.help.syntax);
+	if (!args[0] || !args[1])
+		return embeds.errorSyntax(message.channel, client[message.guild.id].prefix + this.help.syntax);
 
 	const userID = args[0].replace(/[<@!>]/g, '');
 	const reason = args.slice(1).join(' ');

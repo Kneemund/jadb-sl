@@ -8,7 +8,8 @@ exports.help = {
 };
 
 exports.run = (client, message, args) => {
-	if (!args[0] || !args[1]) return embeds.errorSyntax(message.channel, client.config.prefix + this.help.syntax);
+	if (!args[0] || !args[1])
+		return embeds.errorSyntax(message.channel, client[message.guild.id].prefix + this.help.syntax);
 
 	const user = message.guild.member(message.mentions.users.first()) || message.guild.members.get(args[0]);
 	const reason = args.slice(1).join(' ');
