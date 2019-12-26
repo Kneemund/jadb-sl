@@ -35,7 +35,7 @@
       Display information about the channel owner(s).
 
 - `download`:  
-  Provide a download message containing the information specified with `channel config`.
+  Send a download message containing the information specified with `channel config`.
 
 - `help [PAGE]`:  
   Send a message with 6 commands per page and brief explanations/usage information.
