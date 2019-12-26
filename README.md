@@ -29,7 +29,7 @@
         - `channel config thumbnail <URL> [true|false]`:  
           `true` behind the `URL` makes the bot use the website's favicon as thumbnail.
         - `channel config reset`:  
-          Reset the configuration of the channel and deletes it from the database.
+          Reset the configuration of the channel and delete it from the database.
 
     - `channel info`:  
       Display information about the channel owner(s).
