@@ -1,7 +1,7 @@
 const embeds = require('../util/embeds.js');
 const firestore = require('../api/firestore.js');
 
-async function cmdConfig(client, message) {
+function cmdConfig(client, message) {
 	const config = client[message.guild.id];
 	embeds.answer(
 		message.channel,

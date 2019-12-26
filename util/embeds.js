@@ -6,6 +6,8 @@ const COLORS = {
 };
 
 module.exports = {
+	COLORS,
+
 	error(channel, content, title) {
 		var config = {
 			embed: {

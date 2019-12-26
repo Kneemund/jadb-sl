@@ -1,5 +1,15 @@
 const embeds = require('../util/embeds.js');
 const firestore = require('../api/firestore.js');
+const URL = require('url').URL;
+
+function verifyURL(string) {
+	try {
+		new URL(string);
+		return true;
+	} catch (err) {
+		return false;
+	}
+}
 
 async function cmdInit(client, message) {
 	if (message.mentions.users.first()) {
@@ -30,7 +40,7 @@ async function cmdInit(client, message) {
 	}
 }
 
-async function cmdReset(client, message) {
+async function cmdReset(_client, message) {
 	const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
 	if (channelData) {
 		if (channelData.dev) {
@@ -48,6 +58,7 @@ async function cmdConfig(client, message, args) {
 	const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
 	if (channelData) {
 		var value = args.slice(2);
+		if (!value) value = firestore.deleteField();
 		switch (args[1]) {
 			case 'text':
 				firestore.updateChannel(message.guild.id, message.channel.id, { download: { text: value.join(' ') } });
@@ -56,8 +67,9 @@ async function cmdConfig(client, message, args) {
 				firestore.updateChannel(message.guild.id, message.channel.id, { download: { link: value[0] } });
 				break;
 			case 'thumbnail':
+				if (!verifyURL(value[0])) return embeds.error(message.channel, `\`${value[0]}\` is not a valid URL.`);
 				firestore.updateChannel(message.guild.id, message.channel.id, {
-					download: { thumbnail: value[0], favicon: value[1] }
+					download: { thumbnail: value[0], favicon: value[1] === 'true' }
 				});
 				break;
 			case 'reset':
@@ -70,7 +82,7 @@ async function cmdConfig(client, message, args) {
 			default:
 				embeds.errorSyntax(
 					message.channel,
-					`\`${client[message.guild.id].prefix}channel config <text|link|thumbnail>\``
+					`\`${client[message.guild.id].prefix}channel config <text|link|thumbnail|reset>\``
 				);
 				return;
 		}
@@ -80,7 +92,7 @@ async function cmdConfig(client, message, args) {
 	}
 }
 
-async function cmdInfo(client, message) {
+async function cmdInfo(_client, message) {
 	const channelData = await firestore.getChannel(message.guild.id, message.channel.id);
 
 	if (channelData) {

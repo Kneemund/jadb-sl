@@ -15,17 +15,13 @@ exports.run = async (client, message) => {
 		if (channelData) {
 			var values = channelData.download;
 			if ((values.text == '' || !values.text) && (values.link == '' || !values.link)) throw Error;
-			if (!values.text) values.text = '';
-			if (!values.link) values.link = '';
-			if (!values.thumbnail) values.thumbnail = '';
-			if (!values.favicon) values.favicon = false;
 
 			embeds.answer(
 				message.channel,
-				`${values.text}\n${values.link}`,
+				`${values.text || ''}\n${values.link || ''}`,
 				'DOWNLOAD',
-				values.thumbnail,
-				values.favicon === 'true' ? true : false
+				values.thumbnail || '',
+				values.favicon || false
 			);
 		} else {
 			embeds.error(message.channel, `${message.channel} is not initialized.`);

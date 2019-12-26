@@ -89,5 +89,23 @@ module.exports = {
 
 	updateConfig: (guildID, data) => {
 		db.collection('servers').doc(guildID).set(data, { merge: true });
+	},
+
+	addNotify: (guildID, channelID, userID) => {
+		db.collection('servers').doc(guildID).collection('channels').doc(channelID).set(
+			{
+				notify: admin.firestore.FieldValue.arrayUnion(userID)
+			},
+			{ merge: true }
+		);
+	},
+
+	removeNotify: (guildID, channelID, userID) => {
+		db.collection('servers').doc(guildID).collection('channels').doc(channelID).set(
+			{
+				notify: admin.firestore.FieldValue.arrayRemove(userID)
+			},
+			{ merge: true }
+		);
 	}
 };

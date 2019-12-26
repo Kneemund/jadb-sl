@@ -10,7 +10,10 @@ function messageTriggers(message) {
 
 module.exports = (client, message) => {
 	if (message.author.bot) return;
+	if (message.channel.type == 'dm') return;
+
 	messageTriggers(message);
+
 	if (!message.content.startsWith(client[message.guild.id].prefix)) return;
 
 	const args = message.content.slice(client[message.guild.id].prefix.length).trim().split(/ +/g);
