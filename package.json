@@ -1,22 +1,23 @@
 {
-  "name": "discord-bot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "dev": "nodemon index.js debug",
-    "start": "node index.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "discord.js": "^11.5.1",
-    "firebase-admin": "^8.8.0"
-  },
-  "devDependencies": {
-    "dotenv": "^8.2.0",
-    "eslint": "^6.7.2",
-    "eslint-config-google": "^0.14.0",
-    "nodemon": "^2.0.2"
-  }
+	"name": "jadb-sl",
+	"version": "0.0.1",
+	"description": "Just another Discord Bot.",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon index.js debug",
+		"start": "node index.js"
+	},
+	"author": "Niemand",
+	"license": "UNLICENSED",
+	"private": true,
+	"dependencies": {
+		"discord.js": "^11.5.1",
+		"firebase-admin": "^8.8.0"
+	},
+	"devDependencies": {
+		"dotenv": "^8.2.0",
+		"eslint": "^6.7.2",
+		"eslint-config-google": "^0.14.0",
+		"nodemon": "^2.0.2"
+	}
 }
