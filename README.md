@@ -7,7 +7,9 @@
 ---
 
 - `announce [MESSAGE|MESSAGE_WITH_IMAGE]`:  
-  Send an announcement to all users which share at least one server with the bot and that want to be notified (`notify`) about the (initialized) channel.
+  Send an announcement to all users which share at least one server with the bot and that want to be notified (`notify`) about the (initialized) channel.  
+  Hint: You can use Discord's limited version of Markdown alongside additional features like formatted links:  
+  `[text](https://url.com "title")`
 
 - `ban <@USER|USER_ID> <REASON>`:  
   Ban a user.
