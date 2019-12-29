@@ -66,9 +66,11 @@ exports.subCommands = {
 
 exports.help = {
 	syntax: 'lockdown [remove]',
-	category: 'moderation',
-	required: 'MANAGE_CHANNELS',
-	description: 'Locks the current channel for every role that is not whitelisted.'
+	required: {
+		undefined: 'MANAGE_CHANNELS',
+		remove: 'MANAGE_CHANNELS'
+	},
+	description: 'Lock/unlock the channel for everyone except whitelisted roles and the channel owner(s).'
 };
 
 exports.run = (client, message, args) => {

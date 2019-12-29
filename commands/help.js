@@ -2,10 +2,9 @@ const embeds = require('../util/embeds.js');
 const commandsPerPage = 6;
 
 exports.help = {
-	syntax: 'help [page]',
-	category: 'user',
+	syntax: 'help [PAGE]',
 	required: undefined,
-	description: 'Displays this help section.'
+	description: 'Send a message with 6 commands per page and brief explanations/usage information.'
 };
 
 exports.run = (client, message, args) => {
@@ -23,28 +22,39 @@ exports.run = (client, message, args) => {
 	let commandString = '';
 	commands.forEach(commandName => {
 		let command = client.commands.get(commandName);
-		if (command.help)
-			commandString =
-				commandString +
-				`\`${client[message.guild.id].prefix}${command.help.syntax}\`\n${command.help.description}\n\n`;
+		let syntax = `\`${client[message.guild.id].prefix}${command.help.syntax}\``;
+		let description = command.help.description;
+
+		if (command.help) {
+			if (!command.subCommands && command.help.required) {
+				if (!message.member.permissionsIn(message.channel).has(command.help.required)) {
+					syntax = `*${syntax}*`;
+					description = `*${description}*`;
+				}
+			}
+
+			commandString += `${syntax}\n${description}\n\n`;
+		}
 	});
 
 	const embed = {
 		embed: {
-			color: 0x3498db,
+			color: embeds.COLORS.blue,
 			title: '',
 			description: '',
 			fields: [
 				{
 					name: 'COMMANDS',
-					value: commandString
+					value:
+						commandString +
+						'[ᴅᴇᴛᴀɪʟᴇᴅ ʟɪꜱᴛ](https://github.com/NiemandTV/jadb-sl/blob/master/README.md "Detailed list of all commands.")'
 				}
 			],
 			thumbnail: {
 				url: message.guild.iconURL
 			},
 			footer: {
-				text: `Currently viewing page ${page + 1} of ${maxPages}`
+				text: `Currently viewing page ${page + 1} of ${maxPages}.`
 			},
 			author: {
 				name: '­HELP',

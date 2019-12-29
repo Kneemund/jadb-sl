@@ -27,12 +27,11 @@ exports.subCommands = {
 
 exports.help = {
 	syntax: `optifine <${Object.keys(this.subCommands).join('|')}>`,
-	category: 'user',
 	required: {
 		download: undefined,
 		server: undefined
 	},
-	description: 'Links related to Optifine.'
+	description: "Send the link to OptiFine's download page/the invite link to the OptiFine Discord server."
 };
 
 exports.run = (_client, message, args) => {

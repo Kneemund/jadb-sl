@@ -2,9 +2,8 @@ const embeds = require('../util/embeds.js');
 
 exports.help = {
 	syntax: 'wiki',
-	category: 'user',
 	required: undefined,
-	description: 'Link to the official shader wiki.'
+	description: 'Send a link to the shader wiki.'
 };
 
 exports.run = (_client, message) => {

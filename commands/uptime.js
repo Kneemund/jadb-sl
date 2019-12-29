@@ -11,9 +11,8 @@ function duration(ms) {
 
 exports.help = {
 	syntax: 'uptime',
-	category: 'user',
 	required: undefined,
-	description: 'Displays the uptime of the bot.'
+	description: 'Show the uptime of the bot.'
 };
 
 exports.run = (client, message) => {

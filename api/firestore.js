@@ -1,12 +1,6 @@
 const admin = require('firebase-admin');
 const defaultConfig = require('./defaultConfig.json');
 
-/*
-server collections won't be deleted if the bot leaves or gets removed from it
-how to delete collections in case I'll ever need it in the future:
-https://firebase.google.com/docs/firestore/solutions/delete-collections
-*/
-
 const account = {
 	private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
 	client_email: process.env.FIREBASE_CLIENT_EMAIL,
@@ -107,5 +101,44 @@ module.exports = {
 			},
 			{ merge: true }
 		);
+	},
+
+	removeAllNotify: async (guildID, userID) => {
+		const docs = await db
+			.collection('servers')
+			.doc(guildID)
+			.collection('channels')
+			.where('notify', 'array-contains', userID)
+			.get();
+
+		let deleted = [];
+		docs.forEach(doc => {
+			db.collection('servers').doc(guildID).collection('channels').doc(doc.id).set(
+				{
+					notify: admin.firestore.FieldValue.arrayRemove(userID)
+				},
+				{ merge: true }
+			);
+
+			deleted.push(doc.id);
+		});
+
+		return deleted;
+	},
+
+	listNotify: async (guildID, userID) => {
+		const docs = await db
+			.collection('servers')
+			.doc(guildID)
+			.collection('channels')
+			.where('notify', 'array-contains', userID)
+			.get();
+
+		let list = [];
+		docs.forEach(doc => {
+			list.push(doc.id);
+		});
+
+		return list;
 	}
 };

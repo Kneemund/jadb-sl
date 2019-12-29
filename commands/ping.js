@@ -1,16 +1,21 @@
+const { COLORS } = require('../util/embeds.js');
+
 exports.help = {
 	syntax: 'ping',
-	category: 'user',
 	required: undefined,
-	description: 'Displays the latency of the bot.'
+	description: 'Display the calculated latency of the bot.'
 };
 
 exports.run = (client, message) => {
 	const initial = {
 		embed: {
-			color: 0x3498db,
+			color: COLORS.blue,
 			description: '',
-			title: 'PINGING...'
+			title: '',
+			author: {
+				name: 'PINGING...',
+				icon_url: 'https://img.icons8.com/color/48/000000/help--v1.png'
+			}
 		}
 	};
 
@@ -20,9 +25,13 @@ exports.run = (client, message) => {
 
 		const config = {
 			embed: {
-				color: 0x3498db,
+				color: COLORS.blue,
 				description: `Latency: ${latency}ms\nAPI Latency: ${latencyAPI}ms`,
-				title: 'PING'
+				title: '',
+				author: {
+					name: 'PING',
+					icon_url: 'https://img.icons8.com/color/48/000000/help--v1.png'
+				}
 			}
 		};
 

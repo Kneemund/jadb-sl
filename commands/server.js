@@ -133,7 +133,6 @@ exports.subCommands = {
 
 exports.help = {
 	syntax: `server <${Object.keys(this.subCommands).join('|')}>`,
-	category: 'admin',
 	required: {
 		config: 'ADMINISTRATOR',
 		prefix: 'ADMINISTRATOR',
@@ -141,7 +140,7 @@ exports.help = {
 		nolockdown: 'ADMINISTRATOR',
 		sort: 'ADMINISTRATOR'
 	},
-	description: 'Display and edit settings of the bot.'
+	description: 'Show and edit settings of the bot.'
 };
 
 exports.run = (client, message, args) => {

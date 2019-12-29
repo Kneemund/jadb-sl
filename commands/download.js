@@ -3,9 +3,8 @@ const firestore = require('../api/firestore.js');
 
 exports.help = {
 	syntax: 'download',
-	category: 'user',
 	required: undefined,
-	description: 'Get the channel-specific download link.'
+	description: 'Send a download message containing channel-specific information'
 };
 
 exports.run = async (client, message) => {

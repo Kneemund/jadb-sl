@@ -1,8 +1,7 @@
 const embeds = require('../util/embeds.js');
 
 exports.help = {
-	syntax: 'kick <user> <reason>',
-	category: 'moderation',
+	syntax: 'kick <@USER|USER_ID> <REASON>',
 	required: 'KICK_MEMBERS',
 	description: 'Kick a user.'
 };

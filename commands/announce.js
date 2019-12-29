@@ -2,10 +2,10 @@ const firestore = require('../api/firestore.js');
 const embeds = require('../util/embeds.js');
 
 exports.help = {
-	syntax: `announce [message]`,
-	category: 'dev',
+	syntax: `announce [MESSAGE|MESSAGE_WITH_IMAGE]`,
 	required: 'MANAGE_CHANNELS',
-	description: 'Send an announcement to every user that wants to be notified about your channel.'
+	description:
+		'Send an announcement to all users which share at least one server with the bot and that want to be notified about the channel.'
 };
 
 exports.run = async (client, message, args) => {
@@ -17,13 +17,10 @@ exports.run = async (client, message, args) => {
 
 	let channelIconURL;
 	try {
-		if (channelData.download.thumbnail) {
-			channelIconURL = channelData.download.favicon
-				? `https://plus.google.com/_/favicon?domain_url=${channelData.download.thumbnail}`
-				: channelData.download.thumbnail;
-		} else {
-			channelIconURL = message.author.displayAvatarURL;
-		}
+		if (!channelData.download.thumbnail) throw Error;
+		channelIconURL = channelData.download.favicon
+			? `https://plus.google.com/_/favicon?domain_url=${channelData.download.thumbnail}`
+			: channelData.download.thumbnail;
 	} catch (e) {
 		channelIconURL = message.author.displayAvatarURL;
 	}

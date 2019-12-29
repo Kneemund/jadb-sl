@@ -1,8 +1,7 @@
 const embeds = require('../util/embeds.js');
 
 exports.help = {
-	syntax: 'unban <user> <reason>',
-	category: 'moderation',
+	syntax: 'unban <@USER|USER_ID> <REASON>',
 	required: 'BAN_MEMBERS',
 	description: 'Unban a user.'
 };

@@ -5,7 +5,7 @@ const fs = require('fs');
 
 var client = new discord.Client({
 	disableEveryone: true,
-	disabledEvents: [ 'TYPING_START' ]
+	disabledEvents: [ 'TYPING_START', 'MESSAGE_CREATE' ]
 });
 
 fs.readdir('./events/', (err, files) => {

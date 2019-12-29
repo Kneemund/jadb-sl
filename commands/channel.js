@@ -111,7 +111,6 @@ exports.subCommands = {
 
 exports.help = {
 	syntax: `channel <${Object.keys(this.subCommands).join('|')}>`,
-	category: 'moderation',
 	required: {
 		init: 'MANAGE_ROLES',
 		reset: 'MANAGE_ROLES',
