@@ -48,8 +48,8 @@
 - `lockdown [remove]`:  
   Lock/unlock the channel for everyone except whitelisted roles and the channel owner(s).
 
-- `notify [remove]`:  
-  Get notified via direct messages whenever the channel owner(s) make(s) an announcement.
+- `notify [remove [all]|list]`:  
+  Toggle getting notified via direct messages whenever the channel owner(s) make(s) an announcement or list/remove all channels.
 
 - `optifine <download|server>`:  
   Send the link to OptiFine's download page/the invite link to the OptiFine Discord server. 
