@@ -59,6 +59,9 @@
 
 - `purge <AMOUNT>`:  
   Delete up to 100 messages at once that are less than 2 weeks old.
+  
+- `quote`:  
+  Generate an inspirational quote using an [AI](https://inspirobot.me/ "Inspirobot").
 
 - `server <config|prefix|autorole|nolockdown|sort>`:  
   Show and edit settings of the bot.
