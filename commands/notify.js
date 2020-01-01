@@ -59,7 +59,8 @@ exports.help = {
 		undefined: undefined,
 		remove: undefined
 	},
-	description: 'Get notified via direct messages whenever the channel owner(s) make(s) an announcement.'
+	description:
+		'Toggle getting notified via direct messages whenever the channel owner(s) make(s) an announcement or list/remove all channels.'
 };
 
 exports.run = (client, message, args) => {

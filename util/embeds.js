@@ -9,7 +9,7 @@ module.exports = {
 	COLORS,
 
 	error(channel, content, title) {
-		var config = {
+		const config = {
 			embed: {
 				color: COLORS.red,
 				description: content,
@@ -25,7 +25,7 @@ module.exports = {
 	},
 
 	errorSyntax(channel, syntax) {
-		var config = {
+		const config = {
 			embed: {
 				color: COLORS.red,
 				description: `\`${syntax}\``,
@@ -41,7 +41,7 @@ module.exports = {
 	},
 
 	errorAuthorized(channel, command, missingPermissions) {
-		var config = {
+		const config = {
 			embed: {
 				color: COLORS.red,
 				description: command,
@@ -60,7 +60,7 @@ module.exports = {
 	},
 
 	feedback(channel, content, title, timeout) {
-		var config = {
+		const config = {
 			embed: {
 				color: COLORS.green,
 				description: content,
@@ -78,7 +78,7 @@ module.exports = {
 	},
 
 	feedbackReason(channel, content, title, field_value) {
-		var config = {
+		const config = {
 			embed: {
 				color: COLORS.green,
 				description: content,
@@ -100,7 +100,7 @@ module.exports = {
 	},
 
 	answer(channel, content, title, thumbnailURL, thumbnailFromDomain, iconURL) {
-		var config = {
+		const config = {
 			embed: {
 				color: COLORS.blue,
 				description: content,

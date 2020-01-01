@@ -22,10 +22,11 @@ exports.run = (client, message, args) => {
 	let commandString = '';
 	commands.forEach(commandName => {
 		let command = client.commands.get(commandName);
-		let syntax = `\`${client[message.guild.id].prefix}${command.help.syntax}\``;
-		let description = command.help.description;
 
 		if (command.help) {
+			let syntax = `\`${client[message.guild.id].prefix}${command.help.syntax}\``;
+			let description = command.help.description;
+
 			if (!command.subCommands && command.help.required) {
 				if (!message.member.permissionsIn(message.channel).has(command.help.required)) {
 					syntax = `*${syntax}*`;
